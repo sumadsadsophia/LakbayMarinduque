@@ -1,0 +1,102 @@
+
+[
+  {
+    "id": 1,
+    "name": "Boac Cathedral",
+    "municipality": "Boac",
+    "category": "Heritage",
+    "shortDescription": "A historic church that stands as an important religious and cultural landmark in Marinduque.",
+    "description": "The Immaculate Conception Cathedral is a significant religious landmark in Boac. Its historic presence and architecture make it an important part of the town's heritage.",
+    "background": "The cathedral is associated with the religious history and community traditions of Boac.",
+    "travelInfo": "Located in the town center of Boac. Visitors should observe proper behavior and respect religious activities when visiting.",
+    "image": "https://images.unsplash.com/photo-1548013146-72479768bada?w=1000"
+  },
+  {
+    "id": 2,
+    "name": "Poctoy White Beach",
+    "municipality": "Torrijos",
+    "category": "Beach",
+    "shortDescription": "A popular coastal destination known for its shoreline and views of the surrounding sea.",
+    "description": "Poctoy White Beach is a well-known beach destination in Torrijos where visitors can enjoy the coastal scenery and spend time by the sea.",
+    "background": "The beach is one of the destinations associated with Marinduque's coastal tourism.",
+    "travelInfo": "Located in Torrijos. Check local weather, beach conditions, entrance arrangements, and available facilities before visiting.",
+    "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1000"
+  },
+  {
+    "id": 3,
+    "name": "Maniwaya Island",
+    "municipality": "Santa Cruz",
+    "category": "Island",
+    "shortDescription": "An island destination known for its coastal scenery and beach experiences.",
+    "description": "Maniwaya Island is a recognized island destination in Santa Cruz. It offers visitors opportunities to appreciate island landscapes and coastal surroundings.",
+    "background": "The island forms part of the province's island and coastal tourism attractions.",
+    "travelInfo": "Travel arrangements may involve boat transportation. Confirm departure schedules, weather conditions, and local arrangements before traveling.",
+    "image": "https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?w=1000"
+  },
+  {
+    "id": 4,
+    "name": "Tres Reyes Islands",
+    "municipality": "Gasan",
+    "category": "Island",
+    "shortDescription": "A group of islands associated with the coastal scenery of Gasan.",
+    "description": "The Tres Reyes Islands are a group of islands off the coast of Gasan. They are known for their island scenery and marine environment.",
+    "background": "The islands are named after the Three Kings and form part of the coastal identity of Gasan.",
+    "travelInfo": "Boat arrangements are needed to visit the islands. Check local boat availability, weather conditions, and applicable visitor rules.",
+    "image": "https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1000"
+  },
+  {
+    "id": 5,
+    "name": "Moriones Festival",
+    "municipality": "Boac",
+    "category": "Culture",
+    "shortDescription": "A famous Holy Week tradition featuring colorful Morion masks and cultural performances.",
+    "description": "The Moriones Festival is one of Marinduque's best-known cultural traditions. Participants wear Morion masks inspired by Roman soldiers as part of Holy Week observances.",
+    "background": "The Moryonan tradition combines religious devotion, local artistry, community participation, and cultural heritage.",
+    "travelInfo": "Festival activities are associated with Holy Week. Check the official local schedule and event announcements before planning a visit.",
+    "image": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1000"
+  },
+  {
+    "id": 6,
+    "name": "Bathala Caves",
+    "municipality": "Santa Cruz",
+    "category": "Nature",
+    "shortDescription": "A natural cave attraction associated with the natural landscape of Santa Cruz.",
+    "description": "Bathala Caves is a natural attraction in Santa Cruz that can interest visitors who want to learn more about Marinduque's natural environment.",
+    "background": "Natural cave formations contribute to the province's variety of nature-based attractions.",
+    "travelInfo": "Confirm local access, safety requirements, visitor arrangements, and whether guided visits are available before traveling.",
+    "image": "https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=1000"
+  },
+  {
+    "id": 7,
+    "name": "Gasan Church",
+    "municipality": "Gasan",
+    "category": "Heritage",
+    "shortDescription": "A religious landmark connected to the history and community life of Gasan.",
+    "description": "Gasan's historic church is a place of religious and community significance. It offers visitors an opportunity to appreciate the town's local heritage.",
+    "background": "Churches are important parts of the historical and cultural landscape of many communities in Marinduque.",
+    "travelInfo": "Located in Gasan. Check local access and religious service schedules before visiting.",
+    "image": "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=1000"
+  },
+  {
+    "id": 8,
+    "name": "Buenavista Coastal Area",
+    "municipality": "Buenavista",
+    "category": "Nature",
+    "shortDescription": "Explore the coastal scenery and natural surroundings of Buenavista.",
+    "description": "Buenavista offers coastal and rural scenery for visitors interested in experiencing the natural surroundings of Marinduque.",
+    "background": "The municipality contributes to the province's varied landscapes and community-based tourism experiences.",
+    "travelInfo": "Check the exact destination, local access arrangements, weather, and available facilities before visiting.",
+    "image": "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=1000"
+  },
+  {
+    "id": 9,
+    "name": "Mogpog Heritage and Town Center",
+    "municipality": "Mogpog",
+    "category": "Heritage",
+    "shortDescription": "Discover the town center and cultural character of Mogpog.",
+    "description": "Mogpog offers visitors a chance to explore its town center and learn about the community's local history and traditions.",
+    "background": "Mogpog is one of the six municipalities that contribute to Marinduque's cultural identity.",
+    "travelInfo": "Explore the town center and verify the locations of specific heritage sites with local tourism information.",
+    "image": "https://images.unsplash.com/photo-1518005020951-eccb494ad742?w=1000"
+  }
+]
