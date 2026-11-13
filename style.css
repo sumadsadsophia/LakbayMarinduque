@@ -43,7 +43,6 @@ body {
     color: var(--text);
     background: var(--mist-top);
     background-image: var(--bg);
-    background-attachment: fixed;
     overflow-x: hidden;
     padding-bottom: env(safe-area-inset-bottom, 0px);
 }
@@ -473,7 +472,7 @@ button[aria-disabled="true"]:hover { transform: none; box-shadow: none; }
     color: var(--deep);
     border-radius: 999px;
     padding: 5px 12px;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 700;
 }
 .favorite-button {
@@ -1318,6 +1317,25 @@ body { line-height: 1.65; }
 .add-place-button { background: #fff; }
 .add-place-button:hover { background: #edf5f7; }
 
+/* "In trip" / "already added" confirmed state */
+.add-place-button:disabled,
+.planner-add:disabled {
+    opacity: 1;
+    cursor: default;
+    background: var(--soft);
+    border-color: transparent;
+    color: var(--deep);
+}
+
+.btn-main-custom[aria-disabled="true"] {
+    opacity: 1;
+    background: var(--soft);
+    border-color: transparent;
+    color: var(--deep);
+    box-shadow: none;
+    cursor: default;
+}
+
 /* Planner: distinguish the two steps and make the working area easier to use. */
 .planner-layout {
     grid-template-columns: minmax(0, .95fr) minmax(0, 1.05fr);
@@ -1443,10 +1461,16 @@ button, .btn-accent, .btn-main-custom, .details-link, .add-place-button,
 }
 button:focus-visible, a:focus-visible, input:focus-visible,
 select:focus-visible, [tabindex]:focus-visible {
-    outline: 3px solid #e66a4f;
+    outline: 3px solid var(--deep);
     outline-offset: 3px;
 }
 input::placeholder { color: #71878d; opacity: 1; }
+
+.search-box input[type="search"]::-webkit-search-cancel-button,
+.search-box input[type="search"]::-webkit-search-decoration {
+    -webkit-appearance: none;
+    display: none;
+}
 
 /* Tablet and mobile refinements. */
 @media (max-width: 991px) {
@@ -1491,7 +1515,13 @@ input::placeholder { color: #71878d; opacity: 1; }
     .saved-place-card { align-items: flex-start; }
     .saved-place-card img { width: 84px; height: 78px; }
     .footer-links { gap: 32px; }
+    .favorite-button { width: 44px; height: 44px; }
+    .planner-add { width: 44px; height: 44px; }
+    .itinerary-actions button { width: 44px; height: 44px; }
+    .clear-search { min-width: 44px; min-height: 44px; }
+    .modal-close { width: 44px; height: 44px; }
 }
+
 @media (prefers-reduced-motion: reduce) {
     .destination-card, .destination-photo, .saved-place-card, .saved-trip-card,
     .category-chip { transition: none !important; }
@@ -1572,7 +1602,7 @@ input::placeholder { color: #71878d; opacity: 1; }
     margin-bottom: 22px;
 }
 .hero-content h1 {
-    max-width: 9.5ch;
+    max-width: none;
     font-size: clamp(66px, 7.2vw, 118px);
     line-height: .91;
     letter-spacing: -.045em;
@@ -1698,10 +1728,11 @@ input::placeholder { color: #71878d; opacity: 1; }
         padding-top: 150px;
         padding-bottom: 34px;
     }
-    .hero-content h1 {
-        max-width: 10ch;
-        font-size: clamp(48px, 13.5vw, 68px);
+        .hero-content h1 {
+        max-width: none;
+        font-size: clamp(36px, 11vw, 68px);
         line-height: .94;
+        letter-spacing: -.04em;
     }
     .hero-description {
         max-width: 36ch;
@@ -1720,8 +1751,8 @@ input::placeholder { color: #71878d; opacity: 1; }
         height: 32px;
         font-size: 14px;
     }
-    .hero-features strong { font-size: 12px; }
-    .hero-features span { font-size: 11px; line-height: 1.4; }
+    .hero-features strong { font-size: 13px; }
+    .hero-features span { font-size: 12.5px; line-height: 1.45; }
 }
 
 /* Short desktop screens: preserve a balanced hero without forcing scrolling. */
@@ -1731,4 +1762,212 @@ input::placeholder { color: #71878d; opacity: 1; }
     .hero-content h1 { font-size: clamp(64px, 6.4vw, 96px); }
     .hero-features-wrap { padding-bottom: 28px; }
     .hero-features { padding-top: 17px; }
+}
+
+
+/* =========================================================
+   DIRECTORY FILTERS — unified topic chips
+   ========================================================= */
+.discovery-panel .filter-row { align-items: flex-end; }
+.municipality-control { flex: 0 1 420px; max-width: 420px; }
+.topic-filter-section {
+    margin-top: 20px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+}
+.topic-filter-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 12px;
+    margin-bottom: 12px;
+}
+.filter-topic-label { color: var(--deep); font-size: 14px; font-weight: 800; }
+.filter-topic-help { color: var(--muted); font-size: 13px; }
+.topic-filter-chips {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 9px;
+}
+.topic-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 38px;
+    padding: 7px 13px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: #fff;
+    color: var(--deep);
+    font: inherit;
+    font-size: 13px;
+    font-weight: 650;
+    line-height: 1.25;
+    cursor: pointer;
+    transition: background .2s, color .2s, border-color .2s, opacity .2s;
+}
+.topic-chip:hover:not(:disabled) { border-color: var(--deep); background: var(--soft); }
+.topic-chip.is-active,
+.topic-chip[aria-pressed="true"] {
+    border-color: var(--deep);
+    background: var(--deep);
+    color: var(--mist-top);
+}
+.topic-chip:disabled { opacity: .38; cursor: not-allowed; }
+.topic-count {
+    display: inline-grid;
+    min-width: 21px;
+    height: 21px;
+    padding: 0 5px;
+    place-items: center;
+    border-radius: 999px;
+    background: var(--soft);
+    color: var(--deep);
+    font-size: 12px;
+    font-weight: 800;
+}
+.topic-chip.is-active .topic-count,
+.topic-chip[aria-pressed="true"] .topic-count {
+    background: rgba(238, 246, 249, .18);
+    color: var(--mist-top);
+}
+@media (max-width: 576px) {
+    .discovery-panel { padding: 17px; }
+    .discovery-panel .filter-row { align-items: stretch; flex-direction: column; gap: 8px; }
+    .municipality-control { flex: 1 1 auto; max-width: none; width: 100%; }
+    .reset-filter { align-self: flex-start; padding-left: 0; }
+    .topic-filter-chips { gap: 7px; }
+    .topic-chip { min-height: 36px; padding: 7px 11px; font-size: 12px; }
+}
+
+/* =========================================================
+   DESTINATION DETAILS MODAL — UI IMPROVEMENTS
+   ========================================================= */
+
+#destinationModal .modal-dialog {
+    width: min(100% - 32px, 900px);
+    max-width: 900px;
+    margin: 1rem auto;
+}
+
+#destinationModal .destination-modal {
+    display: flex;
+    flex-direction: column;
+    max-height: calc(100dvh - 2rem);
+    overflow: hidden;
+}
+
+#destinationModal .modal-destination-image {
+    flex: 0 0 auto;
+    width: 100%;
+    height: clamp(190px, 30vh, 280px);
+    object-fit: cover;
+}
+
+#destinationModal .destination-modal-body {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    padding: clamp(20px, 3vw, 30px);
+}
+
+/* Close button */
+#destinationModal .modal-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 10;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, .18);
+    cursor: pointer;
+}
+
+#destinationModal .modal-close:focus-visible {
+    outline: 3px solid var(--verm);
+    outline-offset: 3px;
+}
+
+/* Information spacing */
+#destinationModal .detail-information {
+    column-gap: 24px;
+    row-gap: 20px;
+}
+
+#destinationModal .modal-actions {
+    align-items: center;
+}
+
+#destinationModal .modal-actions > button,
+#destinationModal .modal-actions > a {
+    min-height: 44px;
+}
+
+/* Tablet and mobile */
+@media (max-width: 767.98px) {
+    #destinationModal .modal-dialog {
+        width: calc(100% - 24px);
+        max-width: none;
+        margin: 12px auto;
+    }
+
+    #destinationModal .destination-modal {
+        max-height: calc(100dvh - 24px);
+        border-radius: 14px;
+    }
+
+    #destinationModal .modal-destination-image {
+        height: clamp(160px, 25vh, 220px);
+    }
+
+    #destinationModal .destination-modal-body {
+        padding: 20px;
+    }
+
+    #destinationModal .destination-modal-body h2 {
+        font-size: clamp(25px, 6vw, 30px);
+        line-height: 1.15;
+    }
+
+    #destinationModal .detail-information {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 16px;
+    }
+
+    #destinationModal .detail-information .detail-wide {
+        grid-column: auto;
+    }
+
+    #destinationModal .modal-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    #destinationModal .modal-actions > button,
+    #destinationModal .modal-actions > a {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* Very small screens */
+@media (max-width: 380px) {
+    #destinationModal .modal-dialog {
+        width: calc(100% - 16px);
+        margin: 8px auto;
+    }
+
+    #destinationModal .destination-modal {
+        max-height: calc(100dvh - 16px);
+    }
+
+    #destinationModal .destination-modal-body {
+        padding: 16px;
+    }
+
+    #destinationModal .highlight-list li {
+        font-size: 12px;
+        padding: 6px 11px;
+    }
 }

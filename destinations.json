@@ -398,6 +398,50 @@
       ],
       "image": "images/panuluyan-farmstay.jpg",
       "imageCredit": ""
+    },
+    {
+      "id": 19,
+      "name": "Pulang Lupa Shrine",
+      "municipality": "Torrijos",
+      "category": "Heritage",
+      "interests": [
+        "History and heritage"
+      ],
+      "locationDetail": "Bolo, near the Torrijos–Boac boundary",
+      "shortDescription": "A historical park on a ridge commemorating the Battle of Pulang Lupa, with wide views of ocean and mountains.",
+      "description": "A historical park in Bolo, Torrijos, commemorating the Battle of Pulang Lupa during the Philippine–American War. The site has a marker and a hilltop setting with panoramic views of the ocean and, on clearer days, the inland highlands including Mt. Malindig.",
+      "background": "The Marinduque Guide describes the battle as a notable Filipino victory over American forces, and gives the year as 1900. Annual commemoration ceremonies are held around the September anniversary of the battle. The shrine is a place of memory, so visitors are expected to be respectful.",
+      "access": "Reached by road. The usual approach is a tricycle from Torrijos town center; the guide says drivers know the site. There is some climb to reach the best viewpoints.",
+      "confirm": "Current access and any local advisories with the Torrijos tourism office. The site is privately owned but open to the public, and the entrance fee is not specified. Bring water, sun protection and a bag to carry rubbish out, as there are no on-site vendors.",
+      "highlights": [
+        "Battle of Pulang Lupa memorial",
+        "Panoramic ocean and mountain views",
+        "Reported open 24 hours"
+      ],
+      "image": "images/pulang-lupa-shrine.jpg",
+      "imageCredit": ""
+    },
+    {
+      "id": 20,
+      "name": "Bangwayin Farm",
+      "municipality": "Torrijos",
+      "category": "Nature",
+      "interests": [
+        "Viewpoints"
+      ],
+      "locationDetail": "Torrijos uplands",
+      "shortDescription": "An up-and-coming farm viewpoint in the Torrijos uplands with sweeping countryside views.",
+      "description": "A farm and overlooking viewpoint in the uplands of Torrijos, described by visitors as a hidden gem. The elevated panorama over the Torrijos countryside is the main draw.",
+      "background": "The Marinduque Guide says the farm is still being developed, so facilities are limited and changing. It is best treated as an emerging viewpoint rather than a finished attraction.",
+      "access": "Reached by road from Torrijos town proper. The access roads are bumpy and rough in places, so a motorbike (habal-habal) or a vehicle with good clearance helps. Go on a dry day.",
+      "confirm": "Whether the farm is open before you head up, since it is still under development. Also check entrance fees, available facilities, and road conditions after rain. Bring cash, water and sun protection.",
+      "highlights": [
+        "Sweeping upland views",
+        "Still being developed",
+        "Bumpy access road"
+      ],
+      "image": "images/bangwayin-farm.jpg",
+      "imageCredit": ""
     }
   ]
 }

@@ -143,7 +143,7 @@
                         <p class="eyebrow">Tourism and cultural directory</p>
                         <h2 class="section-title" id="destinationsTitle">Explore Marinduque</h2>
                         <p class="section-subtitle">
-                            Search by name, filter by municipality, category or interest, and open any place for
+                            Search by name, choose a municipality and one topic, and open any place for
                             location, general access and background.
                         </p>
                     </div>
@@ -158,7 +158,7 @@
                         <i class="bi bi-search" aria-hidden="true"></i>
                         <label for="searchInput" class="visually-hidden">Search destinations</label>
                         <input type="search" id="searchInput" class="form-control"
-                            placeholder="Search places, towns or experiences, such as caves, waterfalls or churches"
+                            placeholder="Search places, towns or activities"
                             autocomplete="off">
                         <button type="button" id="clearSearch" class="clear-search" hidden
                             data-action="clear-search" aria-label="Clear search">
@@ -167,8 +167,8 @@
                     </div>
 
                     <div class="filter-row">
-                        <div class="filter-control">
-                            <label for="municipalityFilter">Municipality</label>
+                        <div class="filter-control municipality-control">
+                            <label for="municipalityFilter">Where?</label>
                             <select id="municipalityFilter" class="form-select">
                                 <option value="all">All municipalities</option>
                                 <option value="Boac">Boac</option>
@@ -179,35 +179,22 @@
                                 <option value="Santa Cruz">Santa Cruz</option>
                             </select>
                         </div>
-
-                        <div class="filter-control">
-                            <label for="categoryFilter">Category</label>
-                            <select id="categoryFilter" class="form-select">
-                                <option value="all">All categories</option>
-                                <option value="Beach">Beaches</option>
-                                <option value="Island">Islands</option>
-                                <option value="Heritage">Heritage</option>
-                                <option value="Nature">Nature</option>
-                                <option value="Culture">Culture</option>
-                            </select>
-                        </div>
-
                         <button type="button" class="reset-filter" data-action="reset-filters">
                             <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
                             Reset filters
                         </button>
                     </div>
 
-                    <div class="quick-categories" role="group" aria-label="Browse by interest">
-                        <span>Browse by interest</span>
-                        <button type="button" class="category-chip" data-interest="all" aria-pressed="true">All places</button>
-                        <button type="button" class="category-chip" data-interest="Beaches and sandbars" aria-pressed="false">Beaches and sandbars</button>
-                        <button type="button" class="category-chip" data-interest="Island hopping" aria-pressed="false">Island hopping</button>
-                        <button type="button" class="category-chip" data-interest="Waterfalls" aria-pressed="false">Waterfalls</button>
-                        <button type="button" class="category-chip" data-interest="Caves" aria-pressed="false">Caves</button>
-                        <button type="button" class="category-chip" data-interest="Mountains and springs" aria-pressed="false">Mountains and springs</button>
-                        <button type="button" class="category-chip" data-interest="History and heritage" aria-pressed="false">History and heritage</button>
-                        <button type="button" class="category-chip" data-interest="Culture and community" aria-pressed="false">Culture and community</button>
+                    <div class="topic-filter-section">
+                        <div class="topic-filter-heading">
+                            <span class="filter-topic-label">What kind of place?</span>
+                            <span class="filter-topic-help">Choose a topic to narrow the results.</span>
+                        </div>
+                        <div id="topicFilters" class="topic-filter-chips"
+                            role="group" aria-label="Filter destinations by topic">
+                            <button type="button" class="topic-chip is-active"
+                                data-topic="all" aria-pressed="true">All topics</button>
+                        </div>
                     </div>
                 </div>
 
