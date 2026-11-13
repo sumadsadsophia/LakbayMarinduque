@@ -1,142 +1,411 @@
 
 /* ==========================================
    LAKBAY MARINDUQUE
-   MAIN JAVASCRIPT
+   MAIN JAVASCRIPT (vanilla JS, JSON, localStorage)
    ========================================== */
 
+"use strict";
 
-/* ==========================================
-   1. APPLICATION DATA AND STATE
-   ========================================== */
+const DATA_URL = "destinations.json";
+const MAX_SAVED_TRIPS = 20;
+const KEY_PREFIX = "lakbay:";
 
-const STORAGE_KEYS = {
-    favorites: "lakbay_favorites",
-    trips: "lakbay_saved_trips",
-    itinerary: "lakbay_current_itinerary"
+const state = {
+    destinations: [],
+    favorites: [],
+    trips: [],
+    itinerary: [],
+    search: "",
+    municipality: "all",
+    category: "all",
+    interest: "all",
+    selectedId: null,
+    activeTripId: null,
+    pendingConfirm: null,
+    dataLoaded: false
 };
 
-let destinations = [];
-
-let favorites = loadStorage(STORAGE_KEYS.favorites, []);
-let savedTrips = loadStorage(STORAGE_KEYS.trips, []);
-let itinerary = loadStorage(STORAGE_KEYS.itinerary, []);
-
-let selectedDestination = null;
-
-let activeCategory = "all";
-
-
 /* ==========================================
-   2. LOCAL STORAGE HELPERS
+   2. SMALL HELPERS
    ========================================== */
 
-function loadStorage(key, fallback) {
+const $ = id => document.getElementById(id);
+
+function esc(value) {
+    const map = {
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    };
+
+    return String(value ?? "").replace(/[&<>"']/g, ch => map[ch]);
+}
+
+function icon(name) {
+    return `<i class="bi bi-${name}" aria-hidden="true"></i>`;
+}
+
+function normalize(text) {
+    return String(text ?? "")
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "")
+        .toLowerCase()
+        .trim();
+}
+
+function plural(count, one, many) {
+    return `${count} ${count === 1 ? one : many}`;
+}
+
+function formatLocation(destination) {
+    const detail = destination.locationDetail
+        ? `${destination.locationDetail}, `
+        : "";
+
+    return `${detail}${destination.municipality}, Marinduque`;
+}
+
+function findDestination(id) {
+    return state.destinations.find(item => item.id === id);
+}
+
+function debounce(fn, delay) {
+    let timer;
+
+    return (...args) => {
+        clearTimeout(timer);
+        timer = setTimeout(() => fn(...args), delay);
+    };
+}
+
+/* ==========================================
+   3. STORAGE (VALIDATED)
+   ========================================== */
+
+function readStorage(key) {
     try {
-        const stored = localStorage.getItem(key);
-
-        if (stored === null) {
-            return fallback;
-        }
-
-        const parsed = JSON.parse(stored);
-
-        return parsed ?? fallback;
-
+        const raw = localStorage.getItem(key);
+        return raw === null ? null : JSON.parse(raw);
     } catch (error) {
-        console.error("Unable to read local storage:", error);
-        return fallback;
+        return null;
     }
 }
 
-
-function saveStorage(key, value) {
+function writeStorage(key, value) {
     try {
         localStorage.setItem(key, JSON.stringify(value));
         return true;
-
     } catch (error) {
-        console.error("Unable to save data:", error);
-        showToast("Unable to save. Check your browser storage.");
+        showToast(
+            "Your browser blocked saving. Check that storage is enabled.",
+            true
+        );
         return false;
     }
 }
 
-
-/* ==========================================
-   3. INITIALIZE WEBSITE
-   ========================================== */
-
-document.addEventListener("DOMContentLoaded", initializeApp);
-
-
-async function initializeApp() {
-
-    setupNavigation();
-    setupEventListeners();
-
-    await loadDestinations();
-
-    renderAll();
-
-    document.getElementById("tripTitle").value = "";
-
-    setupBootstrapToast();
+function removeStorage(key) {
+    try {
+        localStorage.removeItem(key);
+    } catch (error) {}
 }
 
+function storageKey(name) {
+    return KEY_PREFIX + name;
+}
+
+function cleanIds(value) {
+    if (!Array.isArray(value)) return [];
+
+    const valid = value
+        .map(Number)
+        .filter(id =>
+            Number.isInteger(id) &&
+            findDestination(id)
+        );
+
+    return [...new Set(valid)];
+}
+
+/*
+   Generate a unique trip ID.
+
+   Date.now() alone can produce duplicate IDs
+   when users save trips very quickly.
+*/
+
+function generateTripId() {
+    let id = Date.now();
+
+    while (state.trips.some(trip => trip.id === id)) {
+        id++;
+    }
+
+    return id;
+}
+
+/*
+   Create a consistent destination signature.
+
+   Destination order is ignored.
+
+   Example:
+   [1, 2, 3] and [3, 2, 1] have the same signature.
+*/
+
+function getDestinationSignature(destinationIds) {
+    if (!Array.isArray(destinationIds)) return "";
+
+    return [...new Set(destinationIds.map(Number))]
+        .sort((a, b) => a - b)
+        .join(",");
+}
+
+/*
+   Check whether two trips contain exactly
+   the same destinations, regardless of order.
+*/
+
+function haveSameDestinations(first, second) {
+    const firstSignature = getDestinationSignature(first);
+    const secondSignature = getDestinationSignature(second);
+
+    return firstSignature !== "" &&
+        firstSignature === secondSignature;
+}
+
+/*
+   Remove previously saved duplicate trips.
+
+   IMPORTANT:
+   Trip names are NOT used to determine duplicates.
+
+   If two trips contain the same destinations,
+   only the first one is retained, even if their
+   names are different.
+*/
+
+function cleanTrips(value) {
+    if (!Array.isArray(value)) return [];
+
+    const cleaned = [];
+    const seenDestinations = new Set();
+    const seenIds = new Set();
+
+    value.forEach(trip => {
+        if (
+            !trip ||
+            typeof trip.title !== "string" ||
+            !Array.isArray(trip.destinationIds)
+        ) {
+            return;
+        }
+
+        const destinationIds = cleanIds(trip.destinationIds);
+
+        if (destinationIds.length === 0) return;
+
+        const signature = getDestinationSignature(destinationIds);
+
+        // Remove trips with identical destinations.
+        if (seenDestinations.has(signature)) return;
+
+        seenDestinations.add(signature);
+
+        let id = Number(trip.id);
+
+        if (!Number.isSafeInteger(id) || id <= 0 || seenIds.has(id)) {
+            id = Date.now();
+
+            while (seenIds.has(id)) {
+                id++;
+            }
+        }
+
+        seenIds.add(id);
+
+        cleaned.push({
+            id,
+            title: trip.title.trim().slice(0, 60) || "My Marinduque Trip",
+            destinationIds,
+            createdAt:
+                typeof trip.createdAt === "string"
+                    ? trip.createdAt
+                    : new Date().toISOString()
+        });
+    });
+
+    return cleaned;
+}
+
+function loadSavedData() {
+    state.favorites = cleanIds(
+        readStorage(storageKey("favorites"))
+    );
+
+    state.itinerary = cleanIds(
+        readStorage(storageKey("itinerary"))
+    );
+
+    const storedTrips = readStorage(storageKey("trips"));
+
+    state.trips = cleanTrips(storedTrips);
+
+    // Automatically update storage if old duplicates were found.
+    if (
+        Array.isArray(storedTrips) &&
+        state.trips.length !== storedTrips.length
+    ) {
+        writeStorage(storageKey("trips"), state.trips);
+    }
+
+    const title = readStorage(storageKey("tripTitle"));
+
+    $("tripTitle").value =
+        typeof title === "string"
+            ? title.slice(0, 60)
+            : "";
+
+    // A fresh page load does not assume a trip is actively loaded.
+    state.activeTripId = null;
+}
+
+function persist(name) {
+    return writeStorage(storageKey(name), state[name]);
+}
 
 /* ==========================================
-   4. LOAD DESTINATIONS FROM JSON
+   4. DESTINATION ARTWORK
    ========================================== */
 
-async function loadDestinations() {
+const artCache = {};
 
-    const grid = document.getElementById("destinationGrid");
+function artFor(category) {
+    if (artCache[category]) return artCache[category];
 
-    grid.innerHTML = `
-        <div class="saved-empty">
-            <i class="bi bi-arrow-repeat"></i>
-            Loading destinations...
-        </div>
+    const palettes = {
+        Beach: ["#A9D2E0", "#2c6577"],
+        Island: ["#6aa6bb", "#14363D"],
+        Heritage: ["#2c6577", "#0d2a30"],
+        Culture: ["#14363D", "#7a2515"],
+        Nature: ["#A9D2E0", "#14363D"]
+    };
+
+    const motifs = {
+        Beach: `
+            <circle cx="650" cy="170" r="70" fill="#EEF6F9" opacity=".9"/>
+            <path d="M0 380Q150 350 300 380T600 380T900 380V600H0Z"
+                fill="#2c6577" opacity=".6"/>
+            <path d="M0 450Q150 420 300 450T600 450T900 450V600H0Z"
+                fill="#14363D" opacity=".55"/>
+            <path d="M0 520Q200 490 450 525T900 515V600H0Z"
+                fill="#EEF6F9" opacity=".85"/>
+        `,
+
+        Island: `
+            <circle cx="700" cy="140" r="52" fill="#EEF6F9" opacity=".9"/>
+            <path d="M0 400Q150 370 300 400T600 400T900 400V600H0Z"
+                fill="#2c6577" opacity=".55"/>
+            <path d="M230 430Q430 250 650 430Z" fill="#0d2a30"/>
+            <path d="M0 480Q200 450 450 485T900 475V600H0Z"
+                fill="#14363D" opacity=".8"/>
+        `,
+
+        Heritage: `
+            <circle cx="730" cy="140" r="50" fill="#EEF6F9" opacity=".85"/>
+            <g fill="#0d2a30">
+                <path d="M300 470V300L345 260L390 300V470Z"/>
+                <path d="M510 470V300L555 260L600 300V470Z"/>
+                <path d="M390 470V350L450 310L510 350V470Z"/>
+                <path d="M200 470V420H300V470Z"/>
+                <path d="M600 470V420H700V470Z"/>
+            </g>
+            <path d="M0 470H900V600H0Z" fill="#14363D"/>
+        `,
+
+        Culture: `
+            <path d="M450 120L525 210H375Z" fill="#EEF6F9" opacity=".9"/>
+            <ellipse cx="450" cy="340" rx="130" ry="170"
+                fill="#EEF6F9" opacity=".92"/>
+            <path d="M370 315Q400 285 430 315"
+                stroke="#14363D" stroke-width="12" fill="none"
+                stroke-linecap="round"/>
+            <path d="M470 315Q500 285 530 315"
+                stroke="#14363D" stroke-width="12" fill="none"
+                stroke-linecap="round"/>
+            <path d="M450 335V390"
+                stroke="#14363D" stroke-width="10" stroke-linecap="round"/>
+            <path d="M375 440Q450 410 525 440"
+                stroke="#BD3A21" stroke-width="16" fill="none"
+                stroke-linecap="round"/>
+        `,
+
+        Nature: `
+            <circle cx="700" cy="130" r="48" fill="#EEF6F9" opacity=".9"/>
+            <path d="M0 480L220 240L360 400L560 170L780 420L900 330V600H0Z"
+                fill="#0d2a30" opacity=".85"/>
+            <path d="M0 540L250 380L450 500L700 360L900 480V600H0Z"
+                fill="#14363D"/>
+        `
+    };
+
+    const palette = palettes[category] || palettes.Nature;
+    const motif = motifs[category] || motifs.Nature;
+
+    const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 900 600"
+            preserveAspectRatio="xMidYMid slice">
+            <defs>
+                <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="${palette[0]}"/>
+                    <stop offset="1" stop-color="${palette[1]}"/>
+                </linearGradient>
+            </defs>
+            <rect width="900" height="600" fill="url(#g)"/>
+            ${motif}
+        </svg>
     `;
 
-    try {
+    artCache[category] =
+        "data:image/svg+xml;charset=utf-8," +
+        encodeURIComponent(svg);
 
-        const response = await fetch("destinations.json");
-
-        if (!response.ok) {
-            throw new Error("Unable to load destinations.json");
-        }
-
-        destinations = await response.json();
-
-        if (!Array.isArray(destinations)) {
-            throw new Error("Invalid destination data.");
-        }
-
-    } catch (error) {
-
-        console.error(error);
-
-        grid.innerHTML = `
-            <div class="saved-empty">
-                <i class="bi bi-exclamation-circle"></i>
-                Unable to load destination information.
-                Please run this project using VS Code Live Server
-                and check destinations.json.
-            </div>
-        `;
-
-        destinations = [];
-    }
+    return artCache[category];
 }
 
+function imgAttrs(destination) {
+    const art = artFor(destination.category);
+
+    if (destination.image) {
+        return `src="${esc(destination.image)}" data-fallback="${esc(art)}"`;
+    }
+
+    return `src="${esc(art)}"`;
+}
+
+document.addEventListener("error", event => {
+    const img = event.target;
+
+    if (!img || img.tagName !== "IMG") return;
+
+    if (img.dataset.fallback) {
+        const fallback = img.dataset.fallback;
+        delete img.dataset.fallback;
+        img.src = fallback;
+    } else if (img.classList.contains("hero-image")) {
+        img.remove();
+    }
+}, true);
 
 /* ==========================================
-   5. RENDER ALL SECTIONS
+   5. RENDERING
    ========================================== */
 
 function renderAll() {
-
+    renderStats();
     renderDestinations();
     renderPlannerDestinations();
     renderItinerary();
@@ -145,1065 +414,1369 @@ function renderAll() {
     updateSummary();
 }
 
+function renderStats() {
+    $("statDestinations").textContent = state.destinations.length;
+}
 
-/* ==========================================
-   6. DESTINATION DIRECTORY
-   ========================================== */
+/* ----- DESTINATION SEARCH AND FILTER LOGIC ----- */
 
-function renderDestinations() {
+function getFilteredDestinations() {
+    const query = normalize(state.search);
 
-    const grid = document.getElementById("destinationGrid");
-    const noResults = document.getElementById("noResults");
-
-    const search = document.getElementById("searchInput")
-        .value.trim().toLowerCase();
-
-    const municipality = document.getElementById("municipalityFilter")
-        .value;
-
-    const category = document.getElementById("categoryFilter")
-        .value;
-
-    const filtered = destinations.filter(destination => {
-
-        const searchableText = [
+    return state.destinations.filter(destination => {
+        const searchable = normalize([
             destination.name,
             destination.municipality,
+            destination.locationDetail,
             destination.category,
+            (destination.interests || []).join(" "),
             destination.shortDescription,
             destination.description,
-            destination.background
-        ].join(" ").toLowerCase();
+            destination.background,
+            (destination.highlights || []).join(" ")
+        ].join(" "));
 
-        const matchesSearch = searchableText.includes(search);
+        /*
+           SEARCH PRIORITY:
 
-        const matchesMunicipality =
-            municipality === "all" ||
-            destination.municipality === municipality;
+           When a search query exists, ignore all other filters.
+           Search checks destination names and other destination
+           information independently of municipality, category,
+           and browse-by-interest selections.
+        */
 
-        const matchesCategory =
-            category === "all" ||
-            destination.category === category;
+        if (query) {
+            return searchable.includes(query);
+        }
 
-        const matchesChip =
-            activeCategory === "all" ||
-            destination.category === activeCategory;
+        // Filters apply only when the search box is empty.
+        return (
+            (state.municipality === "all" ||
+                destination.municipality === state.municipality) &&
 
-        return matchesSearch &&
-            matchesMunicipality &&
-            matchesCategory &&
-            matchesChip;
+            (state.category === "all" ||
+                destination.category === state.category) &&
+
+            (state.interest === "all" ||
+                (destination.interests || []).includes(state.interest))
+        );
     });
+}
 
-    document.getElementById("destinationCount").textContent =
-        filtered.length.toString().padStart(2, "0");
+function renderDestinations() {
+    const grid = $("destinationGrid");
+    const noResults = $("noResults");
+
+    if (!state.dataLoaded) return;
+
+    const filtered = getFilteredDestinations();
+
+    $("destinationCount").textContent = filtered.length;
+
+    $("destinationCountLabel").textContent =
+        filtered.length === 1 ? "place" : "places";
+
+    $("clearSearch").hidden = state.search === "";
 
     if (filtered.length === 0) {
-
         grid.innerHTML = "";
         noResults.hidden = false;
-
         return;
     }
 
     noResults.hidden = true;
 
     grid.innerHTML = filtered.map(destination => {
-
-        const isFavorite = favorites.includes(destination.id);
+        const isFavorite = state.favorites.includes(destination.id);
+        const inTrip = state.itinerary.includes(destination.id);
 
         return `
             <article class="destination-card">
-
                 <div class="destination-photo-wrap">
-
-                    <img
-                        src="${escapeHTML(destination.image)}"
-                        alt="${escapeHTML(destination.name)}"
+                    <img ${imgAttrs(destination)}
+                        alt="${esc(destination.name)}"
                         class="destination-photo"
                         loading="lazy"
-                    >
+                        width="900"
+                        height="600">
 
                     <div class="destination-photo-overlay"></div>
 
                     <span class="photo-category">
-                        ${escapeHTML(destination.category.toUpperCase())}
+                        ${esc(destination.category)}
                     </span>
 
-                    <button
-                        type="button"
+                    <button type="button"
                         class="favorite-button ${isFavorite ? "is-favorite" : ""}"
-                        data-favorite="${destination.id}"
-                        aria-label="${isFavorite ? "Remove from" : "Add to"} favorites"
+                        data-action="toggle-favorite"
+                        data-id="${destination.id}"
                         aria-pressed="${isFavorite}"
-                        title="${isFavorite ? "Remove favorite" : "Save favorite"}"
-                    >
-                        <i class="bi ${isFavorite ? "bi-heart-fill" : "bi-heart"}"></i>
+                        aria-label="${isFavorite ? "Remove" : "Save"} ${esc(destination.name)} ${isFavorite ? "from" : "to"} favorites">
+                        ${icon(isFavorite ? "heart-fill" : "heart")}
                     </button>
-
                 </div>
 
                 <div class="destination-card-body">
-
                     <div class="destination-location">
-                        <i class="bi bi-geo-alt-fill"></i>
-                        ${escapeHTML(destination.municipality)}, Marinduque
+                        ${icon("geo-alt-fill")}
+                        ${esc(destination.municipality)}, Marinduque
                     </div>
 
-                    <h3>${escapeHTML(destination.name)}</h3>
+                    <h3>${esc(destination.name)}</h3>
 
-                    <p>${escapeHTML(destination.shortDescription)}</p>
+                    <p>${esc(destination.shortDescription)}</p>
 
                     <div class="destination-card-actions">
-
-                        <button
-                            type="button"
+                        <button type="button"
                             class="details-link"
-                            data-details="${destination.id}"
-                        >
+                            data-action="open-details"
+                            data-id="${destination.id}">
                             Explore details
-                            <i class="bi bi-arrow-up-right"></i>
+                            <span class="visually-hidden">
+                                for ${esc(destination.name)}
+                            </span>
+                            ${icon("arrow-up-right")}
                         </button>
 
-                        <button
-                            type="button"
+                        <button type="button"
                             class="add-place-button"
-                            data-add="${destination.id}"
-                        >
-                            <i class="bi bi-plus-lg"></i>
-                            Add to trip
+                            data-action="add-itinerary"
+                            data-id="${destination.id}"
+                            ${inTrip ? "disabled" : ""}
+                            aria-label="${inTrip ? esc(destination.name) + " is in your trip" : "Add " + esc(destination.name) + " to trip"}">
+                            ${icon(inTrip ? "check-lg" : "plus-lg")}
+                            ${inTrip ? "In trip" : "Add to trip"}
                         </button>
-
                     </div>
-
                 </div>
-
             </article>
         `;
-
     }).join("");
-
-    // Show a fallback if an image cannot be loaded.
-    grid.querySelectorAll(".destination-photo").forEach(img => {
-
-        img.addEventListener("error", function () {
-            this.src = "https://placehold.co/900x600/e9eee6/355b45?text=Destination+Photo";
-        }, { once: true });
-
-    });
 }
-
-
-/* ==========================================
-   7. CATEGORY FILTER BUTTONS
-   ========================================== */
-
-function updateCategoryButtons() {
-
-    document.querySelectorAll(".category-chip").forEach(button => {
-
-        button.classList.toggle(
-            "active",
-            button.dataset.category === activeCategory
-        );
-
-    });
-}
-
-
-/* ==========================================
-   8. DESTINATION DETAILS
-   ========================================== */
-
-function openDestinationDetails(id) {
-
-    const destination = destinations.find(item => item.id === id);
-
-    if (!destination) {
-        return;
-    }
-
-    selectedDestination = destination;
-
-    document.getElementById("modalImage").src = destination.image;
-    document.getElementById("modalImage").alt = destination.name;
-
-    document.getElementById("modalCategory").textContent =
-        destination.category;
-
-    document.getElementById("modalLocation").textContent =
-        destination.municipality + ", Marinduque";
-
-    document.getElementById("modalTitle").textContent =
-        destination.name;
-
-    document.getElementById("modalDescription").textContent =
-        destination.description;
-
-    document.getElementById("modalBackground").textContent =
-        destination.background;
-
-    document.getElementById("modalTravelInfo").textContent =
-        destination.travelInfo;
-
-    updateModalFavoriteButton();
-
-    const modalElement = document.getElementById("destinationModal");
-
-    const modal = bootstrap.Modal.getOrCreateInstance(modalElement);
-
-    modal.show();
-}
-
-
-function updateModalFavoriteButton() {
-
-    if (!selectedDestination) {
-        return;
-    }
-
-    const button = document.getElementById("modalFavorite");
-
-    const isFavorite = favorites.includes(selectedDestination.id);
-
-    button.innerHTML = isFavorite
-        ? '<i class="bi bi-heart-fill"></i> Remove from favorites'
-        : '<i class="bi bi-heart"></i> Save to favorites';
-}
-
-
-/* ==========================================
-   9. FAVORITES / BOOKMARKS
-   ========================================== */
-
-function toggleFavorite(id) {
-
-    const destination = destinations.find(item => item.id === id);
-
-    if (!destination) {
-        return;
-    }
-
-    const index = favorites.indexOf(id);
-
-    if (index === -1) {
-
-        favorites.push(id);
-
-        if (!saveStorage(STORAGE_KEYS.favorites, favorites)) {
-            favorites.pop();
-            return;
-        }
-
-        showToast(destination.name + " added to favorites.");
-
-    } else {
-
-        favorites.splice(index, 1);
-
-        if (!saveStorage(STORAGE_KEYS.favorites, favorites)) {
-            favorites.push(id);
-            return;
-        }
-
-        showToast(destination.name + " removed from favorites.");
-    }
-
-    renderDestinations();
-    renderFavorites();
-    updateSummary();
-    updateModalFavoriteButton();
-}
-
-
-function renderFavorites() {
-
-    const grid = document.getElementById("favoritesGrid");
-
-    const favoriteDestinations = destinations.filter(
-        destination => favorites.includes(destination.id)
-    );
-
-    document.getElementById("favoriteHeadingCount").textContent =
-        favoriteDestinations.length + " saved";
-
-    if (favoriteDestinations.length === 0) {
-
-        grid.innerHTML = `
-            <div class="saved-empty">
-                <i class="bi bi-heart"></i>
-                <strong>No favorite destinations yet.</strong><br>
-                Save places from the destination directory
-                to keep them here.
-            </div>
-        `;
-
-        return;
-    }
-
-    grid.innerHTML = favoriteDestinations.map(destination => `
-
-        <article class="saved-place-card">
-
-            <img
-                src="${escapeHTML(destination.image)}"
-                alt="${escapeHTML(destination.name)}"
-                loading="lazy"
-            >
-
-            <div class="saved-place-info">
-
-                <h6>${escapeHTML(destination.name)}</h6>
-
-                <small>
-                    ${escapeHTML(destination.municipality)}, Marinduque
-                </small>
-
-                <div class="saved-place-actions">
-
-                    <button type="button"
-                        data-details="${destination.id}">
-                        View
-                    </button>
-
-                    <button type="button"
-                        data-remove-favorite="${destination.id}">
-                        Remove
-                    </button>
-
-                </div>
-
-            </div>
-
-        </article>
-
-    `).join("");
-}
-
-
-/* ==========================================
-   10. INTERACTIVE ITINERARY PLANNER
-   ========================================== */
-
-function addToItinerary(id) {
-
-    const destination = destinations.find(item => item.id === id);
-
-    if (!destination) {
-        return;
-    }
-
-    if (itinerary.includes(id)) {
-
-        showToast("This destination is already in your itinerary.");
-        return;
-    }
-
-    itinerary.push(id);
-
-    if (!saveStorage(STORAGE_KEYS.itinerary, itinerary)) {
-        itinerary.pop();
-        return;
-    }
-
-    renderItinerary();
-    renderPlannerDestinations();
-
-    showToast(destination.name + " added to your itinerary.");
-}
-
 
 function renderPlannerDestinations() {
+    const list = $("plannerDestinationList");
+    const query = normalize($("plannerSearch").value);
 
-    const list = document.getElementById("plannerDestinationList");
+    if (!state.dataLoaded) {
+        list.innerHTML = "";
+        return;
+    }
 
-    const search = document.getElementById("plannerSearch")
-        .value.trim().toLowerCase();
-
-    const filtered = destinations.filter(destination => {
-
-        const text = (
-            destination.name + " " + destination.municipality
-        ).toLowerCase();
-
-        return text.includes(search);
-    });
+    const filtered = state.destinations.filter(destination =>
+        normalize(
+            `${destination.name} ${destination.municipality} ${destination.category}`
+        ).includes(query)
+    );
 
     if (filtered.length === 0) {
-
         list.innerHTML = `
             <div class="saved-empty">
                 No destinations match your search.
             </div>
         `;
-
         return;
     }
 
     list.innerHTML = filtered.map(destination => {
-
-        const alreadyAdded = itinerary.includes(destination.id);
+        const added = state.itinerary.includes(destination.id);
 
         return `
-
             <div class="planner-destination-option">
-
-                <img
-                    src="${escapeHTML(destination.image)}"
+                <img ${imgAttrs(destination)}
                     alt=""
                     loading="lazy"
-                >
+                    width="64"
+                    height="56">
 
                 <div class="planner-option-info">
-
-                    <h6>${escapeHTML(destination.name)}</h6>
-
+                    <h4>${esc(destination.name)}</h4>
                     <small>
-                        ${escapeHTML(destination.municipality)} ·
-                        ${escapeHTML(destination.category)}
+                        ${esc(destination.municipality)},
+                        ${esc(destination.category)}
                     </small>
-
                 </div>
 
-                <button
-                    type="button"
+                <button type="button"
                     class="planner-add"
-                    data-add="${destination.id}"
-                    ${alreadyAdded ? "disabled" : ""}
-                    aria-label="Add ${escapeHTML(destination.name)}"
-                    title="${alreadyAdded ? "Already added" : "Add to itinerary"}"
-                >
-                    <i class="bi ${alreadyAdded ? "bi-check-lg" : "bi-plus-lg"}"></i>
+                    data-action="add-itinerary"
+                    data-id="${destination.id}"
+                    ${added ? "disabled" : ""}
+                    aria-label="${added ? esc(destination.name) + " already added" : "Add " + esc(destination.name) + " to itinerary"}">
+                    ${icon(added ? "check-lg" : "plus-lg")}
                 </button>
-
             </div>
-
         `;
-
     }).join("");
 }
 
-
 function renderItinerary() {
+    const list = $("itineraryList");
 
-    const list = document.getElementById("itineraryList");
+    const selected = state.itinerary
+        .map(findDestination)
+        .filter(Boolean);
 
-    const selected = itinerary.map(id =>
-        destinations.find(destination => destination.id === id)
-    ).filter(Boolean);
-
-    document.getElementById("itineraryCount").textContent =
-        selected.length + (selected.length === 1 ? " place" : " places");
+    $("itineraryCount").textContent =
+        plural(selected.length, "place", "places");
 
     if (selected.length === 0) {
-
         list.innerHTML = `
             <div class="itinerary-empty">
-
-                <div class="empty-icon">
-                    <i class="bi bi-map"></i>
-                </div>
-
-                <h5>Your journey starts here</h5>
-
+                <div class="empty-icon">${icon("map")}</div>
+                <h4>Your journey starts here</h4>
                 <p>
-                    Select destinations from the left
-                    to start building your itinerary.
+                    Add places from the list, or load a sample trip
+                    to get started.
                 </p>
-
             </div>
         `;
 
         return;
     }
 
-    list.innerHTML = selected.map((destination, index) => `
+    list.innerHTML = `
+        <ol class="list-unstyled m-0 p-0">
+            ${selected.map((destination, index) => `
+                <li class="itinerary-item">
+                    <span class="itinerary-number" aria-hidden="true">
+                        ${index + 1}
+                    </span>
 
-        <div class="itinerary-item">
+                    <div class="itinerary-item-info">
+                        <h4>${esc(destination.name)}</h4>
+                        <small>
+                            ${esc(destination.municipality)}, Marinduque
+                        </small>
+                    </div>
 
-            <div class="itinerary-number">
-                ${index + 1}
+                    <div class="itinerary-actions">
+                        <button type="button"
+                            data-action="move-up"
+                            data-id="${destination.id}"
+                            aria-label="Move ${esc(destination.name)} up"
+                            ${index === 0 ? "disabled" : ""}>
+                            ${icon("arrow-up")}
+                        </button>
+
+                        <button type="button"
+                            data-action="move-down"
+                            data-id="${destination.id}"
+                            aria-label="Move ${esc(destination.name)} down"
+                            ${index === selected.length - 1 ? "disabled" : ""}>
+                            ${icon("arrow-down")}
+                        </button>
+
+                        <button type="button"
+                            class="remove-item"
+                            data-action="remove-itinerary"
+                            data-id="${destination.id}"
+                            aria-label="Remove ${esc(destination.name)}">
+                            ${icon("x-lg")}
+                        </button>
+                    </div>
+                </li>
+            `).join("")}
+        </ol>
+    `;
+}
+
+function renderFavorites() {
+    const grid = $("favoritesGrid");
+
+    const favorites = state.favorites
+        .map(findDestination)
+        .filter(Boolean);
+
+    $("favoriteHeadingCount").textContent =
+        `${favorites.length} saved`;
+
+    if (favorites.length === 0) {
+        grid.innerHTML = `
+            <div class="saved-empty">
+                ${icon("heart")}
+                <strong>No favorite destinations yet.</strong><br>
+                Tap the heart on any destination card to keep it here.
             </div>
+        `;
 
-            <div class="itinerary-item-info">
+        return;
+    }
 
-                <h6>${escapeHTML(destination.name)}</h6>
+    grid.innerHTML = favorites.map(destination => `
+        <article class="saved-place-card">
+            <img ${imgAttrs(destination)}
+                alt="${esc(destination.name)}"
+                loading="lazy"
+                width="88"
+                height="80">
+
+            <div class="saved-place-info">
+                <h4>${esc(destination.name)}</h4>
 
                 <small>
-                    ${escapeHTML(destination.municipality)}, Marinduque
+                    ${esc(destination.municipality)}, Marinduque
                 </small>
 
+                <div class="saved-place-actions">
+                    <button type="button"
+                        data-action="open-details"
+                        data-id="${destination.id}">
+                        View
+                    </button>
+
+                    <button type="button"
+                        data-action="remove-favorite"
+                        data-id="${destination.id}"
+                        aria-label="Remove ${esc(destination.name)} from favorites">
+                        Remove
+                    </button>
+                </div>
             </div>
-
-            <div class="itinerary-actions">
-
-                <button type="button"
-                    data-move-up="${destination.id}"
-                    aria-label="Move ${escapeHTML(destination.name)} up"
-                    title="Move up"
-                    ${index === 0 ? "disabled" : ""}>
-                    <i class="bi bi-arrow-up"></i>
-                </button>
-
-                <button type="button"
-                    data-move-down="${destination.id}"
-                    aria-label="Move ${escapeHTML(destination.name)} down"
-                    title="Move down"
-                    ${index === selected.length - 1 ? "disabled" : ""}>
-                    <i class="bi bi-arrow-down"></i>
-                </button>
-
-                <button type="button"
-                    class="remove-item"
-                    data-remove-itinerary="${destination.id}"
-                    aria-label="Remove ${escapeHTML(destination.name)}"
-                    title="Remove">
-                    <i class="bi bi-x-lg"></i>
-                </button>
-
-            </div>
-
-        </div>
-
+        </article>
     `).join("");
 }
 
-
-function moveItineraryItem(id, direction) {
-
-    const currentIndex = itinerary.indexOf(id);
-
-    if (currentIndex === -1) {
-        return;
-    }
-
-    const newIndex = currentIndex + direction;
-
-    if (newIndex < 0 || newIndex >= itinerary.length) {
-        return;
-    }
-
-    const temp = itinerary[currentIndex];
-
-    itinerary[currentIndex] = itinerary[newIndex];
-    itinerary[newIndex] = temp;
-
-    if (!saveStorage(STORAGE_KEYS.itinerary, itinerary)) {
-        itinerary[currentIndex] = itinerary[newIndex];
-        itinerary[newIndex] = temp;
-        return;
-    }
-
-    renderItinerary();
-    renderPlannerDestinations();
-}
-
-
-function removeFromItinerary(id) {
-
-    const destination = destinations.find(item => item.id === id);
-
-    const oldItinerary = [...itinerary];
-
-    itinerary = itinerary.filter(itemId => itemId !== id);
-
-    if (!saveStorage(STORAGE_KEYS.itinerary, itinerary)) {
-        itinerary = oldItinerary;
-        return;
-    }
-
-    renderItinerary();
-    renderPlannerDestinations();
-
-    showToast(
-        (destination ? destination.name : "Destination") +
-        " removed from itinerary."
-    );
-}
-
-
-function clearItinerary() {
-
-    if (itinerary.length === 0) {
-        showToast("Your itinerary is already empty.");
-        return;
-    }
-
-    if (!confirm("Are you sure you want to clear your current itinerary?")) {
-        return;
-    }
-
-    itinerary = [];
-
-    if (!saveStorage(STORAGE_KEYS.itinerary, itinerary)) {
-        return;
-    }
-
-    renderItinerary();
-    renderPlannerDestinations();
-
-    showToast("Your itinerary has been cleared.");
-}
-
-
-/* ==========================================
-   11. SAVE AND RESTORE TRIPS
-   ========================================== */
-
-function saveCurrentTrip() {
-
-    if (itinerary.length === 0) {
-
-        showToast("Add at least one destination before saving.");
-        return;
-    }
-
-    const titleInput = document.getElementById("tripTitle");
-
-    const title = titleInput.value.trim() || "My Marinduque Trip";
-
-    const newTrip = {
-        id: Date.now(),
-        title: title,
-        destinationIds: [...itinerary],
-        createdAt: new Date().toISOString()
-    };
-
-    savedTrips.unshift(newTrip);
-
-    if (!saveStorage(STORAGE_KEYS.trips, savedTrips)) {
-        savedTrips.shift();
-        return;
-    }
-
-    renderSavedTrips();
-    updateSummary();
-
-    showToast("Your trip has been saved.");
-
-    titleInput.value = "";
-}
-
-
 function renderSavedTrips() {
+    const grid = $("savedTripsGrid");
 
-    const grid = document.getElementById("savedTripsGrid");
+    $("tripHeadingCount").textContent =
+        `${state.trips.length} saved`;
 
-    document.getElementById("tripHeadingCount").textContent =
-        savedTrips.length + " saved";
-
-    if (savedTrips.length === 0) {
-
+    if (state.trips.length === 0) {
         grid.innerHTML = `
             <div class="saved-empty">
-                <i class="bi bi-bookmark"></i>
+                ${icon("bookmark")}
                 <strong>No saved trips yet.</strong><br>
-                Create an itinerary and save it to keep it here.
+                Build an itinerary and press Save this trip
+                to keep it here.
             </div>
         `;
 
         return;
     }
 
-    grid.innerHTML = savedTrips.map(trip => {
+    grid.innerHTML = state.trips.map(trip => {
+        const names = trip.destinationIds
+            .map(findDestination)
+            .filter(Boolean)
+            .map(item => item.name);
 
-        const tripDestinations = trip.destinationIds.map(id =>
-            destinations.find(destination => destination.id === id)
-        ).filter(Boolean);
+        const date = new Date(trip.createdAt);
 
-        const destinationNames = tripDestinations
-            .map(destination => destination.name)
-            .join(", ");
-
-        const date = new Date(trip.createdAt).toLocaleDateString(
-            "en-PH",
-            {
+        const dateLabel = Number.isNaN(date.getTime())
+            ? ""
+            : date.toLocaleDateString("en-PH", {
                 year: "numeric",
                 month: "short",
                 day: "numeric"
-            }
-        );
+            });
 
         return `
-
             <article class="saved-trip-card">
-
                 <div class="saved-trip-top">
-
                     <div>
-                        <h5>${escapeHTML(trip.title)}</h5>
-
+                        <h4>${esc(trip.title)}</h4>
                         <p>
-                            ${tripDestinations.length}
-                            ${tripDestinations.length === 1 ? "destination" : "destinations"}
+                            ${plural(names.length, "destination", "destinations")}
                         </p>
                     </div>
 
-                    <i class="bi bi-bookmark-star-fill"
-                        style="color: #c69d59; font-size: 22px;"></i>
-
+                    ${icon("bookmark-star-fill")}
                 </div>
 
-                <p>${escapeHTML(destinationNames)}</p>
+                <p>
+                    ${esc(names.join(", ") || "No destinations")}
+                </p>
 
-                <span class="trip-date">
-                    SAVED ${escapeHTML(date.toUpperCase())}
-                </span>
+                ${dateLabel
+                    ? `<span class="trip-date">Saved ${esc(dateLabel)}</span>`
+                    : ""
+                }
 
                 <div class="saved-trip-actions">
-
                     <button type="button"
-                        data-load-trip="${trip.id}">
-                        <i class="bi bi-arrow-counterclockwise"></i>
+                        data-action="load-trip"
+                        data-id="${trip.id}">
+                        ${icon("arrow-counterclockwise")}
                         Load trip
                     </button>
 
                     <button type="button"
                         class="delete-trip"
-                        data-delete-trip="${trip.id}">
-                        <i class="bi bi-trash"></i>
+                        data-action="delete-trip"
+                        data-id="${trip.id}">
+                        ${icon("trash")}
                         Delete
                     </button>
-
                 </div>
-
             </article>
-
         `;
-
     }).join("");
 }
 
+function updateSummary() {
+    $("favoriteCount").textContent = state.favorites.length;
+    $("savedTripCount").textContent = state.trips.length;
+}
 
-function loadSavedTrip(id) {
+/* ==========================================
+   6. ACTIONS
+   ========================================== */
 
-    const trip = savedTrips.find(item => item.id === id);
+/* ----- Filters ----- */
 
-    if (!trip) {
+function setCategory(value) {
+    state.category = value;
+    $("categoryFilter").value = value;
+    renderDestinations();
+}
+
+function setInterest(value) {
+    state.interest = value;
+
+    document.querySelectorAll(".category-chip").forEach(chip => {
+        chip.setAttribute(
+            "aria-pressed",
+            String(chip.dataset.interest === value)
+        );
+    });
+
+    renderDestinations();
+}
+
+function resetFilters() {
+    state.search = "";
+    state.municipality = "all";
+    state.category = "all";
+
+    $("searchInput").value = "";
+    $("municipalityFilter").value = "all";
+    $("categoryFilter").value = "all";
+
+    setInterest("all");
+}
+
+/* ----- Favorites ----- */
+
+function toggleFavorite(id) {
+    const destination = findDestination(id);
+
+    if (!destination) return;
+
+    const previous = [...state.favorites];
+    const wasFavorite = previous.includes(id);
+
+    state.favorites = wasFavorite
+        ? previous.filter(item => item !== id)
+        : [...previous, id];
+
+    if (!persist("favorites")) {
+        state.favorites = previous;
         return;
     }
 
-    const validIds = trip.destinationIds.filter(id =>
-        destinations.some(destination => destination.id === id)
+    renderDestinations();
+    renderFavorites();
+    updateSummary();
+    updateModalFavorite();
+
+    showToast(
+        `${destination.name} ${wasFavorite ? "removed from" : "added to"} favorites.`
     );
+}
 
-    const oldItinerary = [...itinerary];
+/* ----- Itinerary ----- */
 
-    itinerary = [...validIds];
+function addToItinerary(id) {
+    const destination = findDestination(id);
 
-    if (!saveStorage(STORAGE_KEYS.itinerary, itinerary)) {
-        itinerary = oldItinerary;
+    if (!destination) return;
+
+    if (state.itinerary.includes(id)) {
+        showToast(
+            `${destination.name} is already in your itinerary.`,
+            true
+        );
+
         return;
     }
 
-    document.getElementById("tripTitle").value = trip.title;
+    const previous = [...state.itinerary];
+    const previousActiveTripId = state.activeTripId;
+
+    state.itinerary = [...previous, id];
+    state.activeTripId = null;
+
+    if (!persist("itinerary")) {
+        state.itinerary = previous;
+        state.activeTripId = previousActiveTripId;
+        return;
+    }
 
     renderItinerary();
     renderPlannerDestinations();
+    renderDestinations();
+    updateModalItinerary();
 
-    document.getElementById("planner").scrollIntoView({
-        behavior: "smooth"
-    });
-
-    showToast("Saved trip loaded successfully.");
+    showToast(`${destination.name} added to your itinerary.`);
 }
 
+function moveItineraryItem(id, direction) {
+    const from = state.itinerary.indexOf(id);
+    const to = from + direction;
 
-function deleteSavedTrip(id) {
-
-    const trip = savedTrips.find(item => item.id === id);
-
-    if (!trip) {
+    if (
+        from === -1 ||
+        to < 0 ||
+        to >= state.itinerary.length
+    ) {
         return;
     }
 
-    if (!confirm("Delete the saved trip '" + trip.title + "'?")) {
+    const previous = [...state.itinerary];
+    const previousActiveTripId = state.activeTripId;
+    const next = [...previous];
+
+    [next[from], next[to]] = [next[to], next[from]];
+
+    state.itinerary = next;
+    state.activeTripId = null;
+
+    if (!persist("itinerary")) {
+        state.itinerary = previous;
+        state.activeTripId = previousActiveTripId;
         return;
     }
 
-    const oldTrips = [...savedTrips];
+    renderItinerary();
+}
 
-    savedTrips = savedTrips.filter(item => item.id !== id);
+function removeFromItinerary(id) {
+    const destination = findDestination(id);
 
-    if (!saveStorage(STORAGE_KEYS.trips, savedTrips)) {
-        savedTrips = oldTrips;
+    const previous = [...state.itinerary];
+    const previousActiveTripId = state.activeTripId;
+
+    state.itinerary = previous.filter(item => item !== id);
+    state.activeTripId = null;
+
+    if (!persist("itinerary")) {
+        state.itinerary = previous;
+        state.activeTripId = previousActiveTripId;
+        return;
+    }
+
+    renderItinerary();
+    renderPlannerDestinations();
+    renderDestinations();
+    updateModalItinerary();
+
+    showToast(
+        `${destination ? destination.name : "Destination"} removed from itinerary.`
+    );
+}
+
+function clearItinerary() {
+    if (state.itinerary.length === 0) {
+        showToast("Your itinerary is already empty.", true);
+        return;
+    }
+
+    confirmAction({
+        title: "Clear itinerary?",
+        message: "This removes every stop from your current plan. Saved trips are not affected.",
+        okLabel: "Clear itinerary",
+
+        onConfirm: () => {
+            const previous = [...state.itinerary];
+            const previousActiveTripId = state.activeTripId;
+
+            state.itinerary = [];
+            state.activeTripId = null;
+
+            if (!persist("itinerary")) {
+                state.itinerary = previous;
+                state.activeTripId = previousActiveTripId;
+                return;
+            }
+
+            renderItinerary();
+            renderPlannerDestinations();
+            renderDestinations();
+            updateModalItinerary();
+
+            showToast("Your itinerary has been cleared.");
+        }
+    });
+}
+
+/* ==========================================
+   6.1 SAVED TRIPS
+   ========================================== */
+
+/*
+   IMPORTANT DUPLICATE PREVENTION:
+
+   A trip is considered a duplicate if its
+   destination IDs are exactly the same.
+
+   Changing the trip name will NOT bypass
+   duplicate detection.
+
+   Changing the order will NOT bypass it either.
+*/
+
+function saveCurrentTrip() {
+    if (state.itinerary.length === 0) {
+        showToast(
+            "Add at least one destination before saving.",
+            true
+        );
+
+        return;
+    }
+
+    const titleInput = $("tripTitle");
+
+    const tripTitle =
+        titleInput.value.trim() || "My Marinduque Trip";
+
+    const destinationIds = [...state.itinerary];
+
+    const signature = getDestinationSignature(destinationIds);
+
+    // Validate the itinerary before saving.
+    if (!signature) {
+        showToast("Your itinerary contains no valid destinations.", true);
+        return;
+    }
+
+    /*
+       Check existing saved trips using destinations only.
+
+       Example:
+
+       Saved:
+       Name: My Marinduque Trip
+       Destinations: 1, 2, 3
+
+       Attempt:
+       Name: My Weekend Escape
+       Destinations: 1, 2, 3
+
+       RESULT: BLOCKED.
+    */
+
+    const duplicate = state.trips.find(savedTrip =>
+        getDestinationSignature(savedTrip.destinationIds) === signature
+    );
+
+    if (duplicate) {
+        showToast(
+            `These destinations are already saved as "${duplicate.title}". Changing the trip name does not create a new trip.`,
+            true
+        );
+
+        return;
+    }
+
+    if (state.trips.length >= MAX_SAVED_TRIPS) {
+        showToast(
+            `You can save up to ${MAX_SAVED_TRIPS} trips. Delete one to make room.`,
+            true
+        );
+
+        return;
+    }
+
+    const trip = {
+        id: generateTripId(),
+        title: tripTitle.slice(0, 60),
+        destinationIds,
+        createdAt: new Date().toISOString()
+    };
+
+    const previous = [...state.trips];
+
+    state.trips = [trip, ...previous];
+
+    if (!persist("trips")) {
+        state.trips = previous;
         return;
     }
 
     renderSavedTrips();
     updateSummary();
 
-    showToast("Saved trip deleted.");
+    // Clear the name after a successful save.
+    titleInput.value = "";
+    writeStorage(storageKey("tripTitle"), "");
+
+    showToast(`"${trip.title}" saved successfully.`);
 }
 
+/* ----- LOAD SAVED TRIP ----- */
 
-/* ==========================================
-   12. UPDATE COUNTS
-   ========================================== */
+function loadSavedTrip(id) {
+    const trip = state.trips.find(item => item.id === id);
 
-function updateSummary() {
+    if (!trip) {
+        showToast("This saved trip could not be found.", true);
+        return;
+    }
 
-    document.getElementById("favoriteCount").textContent =
-        favorites.length;
+    const previous = [...state.itinerary];
+    const previousActiveTripId = state.activeTripId;
+    const previousTitle = $("tripTitle").value;
 
-    document.getElementById("savedTripCount").textContent =
-        savedTrips.length;
-}
+    state.itinerary = [...trip.destinationIds];
+    state.activeTripId = trip.id;
 
+    if (!persist("itinerary")) {
+        state.itinerary = previous;
+        state.activeTripId = previousActiveTripId;
+        return;
+    }
 
-/* ==========================================
-   13. EVENT LISTENERS
-   ========================================== */
+    $("tripTitle").value = trip.title;
 
-function setupEventListeners() {
+    if (!writeStorage(storageKey("tripTitle"), trip.title)) {
+        state.itinerary = previous;
+        state.activeTripId = previousActiveTripId;
+        $("tripTitle").value = previousTitle;
+        persist("itinerary");
+        return;
+    }
 
-    // Destination search
-    document.getElementById("searchInput")
-        .addEventListener("input", renderDestinations);
+    renderItinerary();
+    renderPlannerDestinations();
+    renderDestinations();
+    updateModalItinerary();
 
-    // Clear search
-    document.getElementById("clearSearch")
-        .addEventListener("click", () => {
-
-            document.getElementById("searchInput").value = "";
-
-            renderDestinations();
-
-        });
-
-    // Municipality filter
-    document.getElementById("municipalityFilter")
-        .addEventListener("change", renderDestinations);
-
-    // Category filter
-    document.getElementById("categoryFilter")
-        .addEventListener("change", renderDestinations);
-
-    // Category chips
-    document.querySelectorAll(".category-chip").forEach(button => {
-
-        button.addEventListener("click", () => {
-
-            activeCategory = button.dataset.category;
-
-            document.getElementById("categoryFilter").value = "all";
-
-            updateCategoryButtons();
-            renderDestinations();
-
-        });
-
+    $("planner").scrollIntoView({
+        behavior: "smooth"
     });
 
-    // Reset all filters
-    document.getElementById("resetFilters")
-        .addEventListener("click", resetFilters);
-
-    document.getElementById("emptyReset")
-        .addEventListener("click", resetFilters);
-
-    // Planner search
-    document.getElementById("plannerSearch")
-        .addEventListener("input", renderPlannerDestinations);
-
-    // Clear itinerary
-    document.getElementById("clearItinerary")
-        .addEventListener("click", clearItinerary);
-
-    // Save trip
-    document.getElementById("saveTrip")
-        .addEventListener("click", saveCurrentTrip);
-
-    // Modal favorite
-    document.getElementById("modalFavorite")
-        .addEventListener("click", () => {
-
-            if (selectedDestination) {
-                toggleFavorite(selectedDestination.id);
-            }
-
-        });
-
-    // Modal add to itinerary
-    document.getElementById("modalAddItinerary")
-        .addEventListener("click", () => {
-
-            if (selectedDestination) {
-                addToItinerary(selectedDestination.id);
-            }
-
-        });
-
-    // Event delegation for generated elements
-    document.addEventListener("click", handleDynamicActions);
+    showToast(`"${trip.title}" loaded into the planner.`);
 }
 
-
 /* ==========================================
-   14. DYNAMIC BUTTON HANDLER
+   6.2 DELETE SAVED TRIP
    ========================================== */
 
-function handleDynamicActions(event) {
+/*
+   When deleting a saved trip:
 
-    const target = event.target.closest("button");
+   1. Remove it from saved itineraries.
+   2. If that trip is currently loaded, clear
+      the current itinerary as well.
+   3. Clear its trip name.
+   4. Update localStorage.
+   5. Refresh all affected sections.
 
-    if (!target) {
+   Other saved trips remain untouched.
+*/
+
+function deleteSavedTrip(id) {
+    const trip = state.trips.find(item => item.id === id);
+
+    if (!trip) {
+        showToast("This saved trip could not be found.", true);
         return;
     }
 
-    // Favorite buttons
-    if (target.dataset.favorite) {
-        toggleFavorite(Number(target.dataset.favorite));
-        return;
-    }
+    confirmAction({
+        title: "Delete saved trip?",
 
-    // Destination details
-    if (target.dataset.details) {
-        openDestinationDetails(Number(target.dataset.details));
-        return;
-    }
+        message:
+            `"${trip.title}" will be removed from this device. ` +
+            "If it is currently loaded in your planner, its itinerary will also be cleared.",
 
-    // Add destination
-    if (target.dataset.add) {
-        addToItinerary(Number(target.dataset.add));
-        return;
-    }
+        okLabel: "Delete trip",
 
-    // Remove favorite
-    if (target.dataset.removeFavorite) {
-        toggleFavorite(Number(target.dataset.removeFavorite));
-        return;
-    }
+        onConfirm: () => {
+            const previousTrips = [...state.trips];
+            const previousItinerary = [...state.itinerary];
+            const previousActiveTripId = state.activeTripId;
+            const previousTitle = $("tripTitle").value;
+            const previousStoredTitle = readStorage(storageKey("tripTitle"));
 
-    // Remove itinerary item
-    if (target.dataset.removeItinerary) {
-        removeFromItinerary(Number(target.dataset.removeItinerary));
-        return;
-    }
+            const isLoadedTrip = state.activeTripId === id;
 
-    // Move up
-    if (target.dataset.moveUp) {
-        moveItineraryItem(Number(target.dataset.moveUp), -1);
-        return;
-    }
+            // Remove the selected saved trip.
+            state.trips = previousTrips.filter(
+                item => item.id !== id
+            );
 
-    // Move down
-    if (target.dataset.moveDown) {
-        moveItineraryItem(Number(target.dataset.moveDown), 1);
-        return;
-    }
+            // Clear the planner only if this exact trip is loaded.
+            if (isLoadedTrip) {
+                state.itinerary = [];
+                state.activeTripId = null;
+                $("tripTitle").value = "";
+            }
 
-    // Load saved trip
-    if (target.dataset.loadTrip) {
-        loadSavedTrip(Number(target.dataset.loadTrip));
-        return;
-    }
+            // Save the updated trips.
+            if (!persist("trips")) {
+                state.trips = previousTrips;
+                state.itinerary = previousItinerary;
+                state.activeTripId = previousActiveTripId;
+                $("tripTitle").value = previousTitle;
+                return;
+            }
 
-    // Delete saved trip
-    if (target.dataset.deleteTrip) {
-        deleteSavedTrip(Number(target.dataset.deleteTrip));
-    }
+            // Save the cleared itinerary if necessary.
+            if (isLoadedTrip && !persist("itinerary")) {
+                state.trips = previousTrips;
+                state.itinerary = previousItinerary;
+                state.activeTripId = previousActiveTripId;
+
+                $("tripTitle").value = previousTitle;
+
+                persist("trips");
+                writeStorage(storageKey("itinerary"), previousItinerary);
+                writeStorage(storageKey("tripTitle"), previousStoredTitle || "");
+
+                return;
+            }
+
+            // Clear the stored trip title.
+            if (isLoadedTrip) {
+                removeStorage(storageKey("tripTitle"));
+            }
+
+            // Refresh all relevant sections.
+            renderSavedTrips();
+            renderItinerary();
+            renderPlannerDestinations();
+            renderDestinations();
+            updateSummary();
+            updateModalItinerary();
+
+            showToast(
+                isLoadedTrip
+                    ? "Saved trip deleted and its itinerary cleared."
+                    : "Saved trip deleted successfully."
+            );
+        }
+    });
 }
 
-
 /* ==========================================
-   15. RESET FILTERS
+   7. MODALS, TOAST AND CONFIRM DIALOG
    ========================================== */
 
-function resetFilters() {
+function getModal(id) {
+    if (typeof bootstrap === "undefined") return null;
 
-    document.getElementById("searchInput").value = "";
-
-    document.getElementById("municipalityFilter").value = "all";
-
-    document.getElementById("categoryFilter").value = "all";
-
-    activeCategory = "all";
-
-    updateCategoryButtons();
-    renderDestinations();
+    return bootstrap.Modal.getOrCreateInstance($(id));
 }
 
+function showModal(id) {
+    const modal = getModal(id);
+
+    if (modal) modal.show();
+}
+
+function hideModal(id) {
+    const modal = getModal(id);
+
+    if (modal) modal.hide();
+}
+
+function openDestinationDetails(id) {
+    const destination = findDestination(id);
+
+    if (!destination) return;
+
+    state.selectedId = id;
+
+    const image = $("modalImage");
+
+    image.removeAttribute("data-fallback");
+
+    image.src = destination.image || artFor(destination.category);
+
+    if (destination.image) {
+        image.dataset.fallback = artFor(destination.category);
+    }
+
+    image.alt = destination.name;
+
+    $("modalCategory").textContent = destination.category;
+
+    $("modalLocation").innerHTML =
+        `${icon("geo-alt-fill")} ${esc(destination.municipality)}, Marinduque`;
+
+    $("modalTitle").textContent = destination.name;
+    $("modalDescription").textContent = destination.description;
+    $("modalBackground").textContent = destination.background;
+    $("modalLocationDetail").textContent = formatLocation(destination);
+
+    $("modalAccess").textContent =
+        destination.access ||
+        "Ask the local tourism office how to get there.";
+
+    $("modalConfirm").textContent =
+        destination.confirm ||
+        "Visiting arrangements and conditions with the local tourism office.";
+
+    const credit = $("modalCredit");
+
+    credit.hidden = !destination.imageCredit;
+
+    credit.textContent = destination.imageCredit
+        ? `Photo: ${destination.imageCredit}`
+        : "";
+
+    $("modalHighlights").innerHTML =
+        (destination.highlights || [])
+            .map(item => `<li>${esc(item)}</li>`)
+            .join("");
+
+    updateModalFavorite();
+    updateModalItinerary();
+
+    showModal("destinationModal");
+}
+
+function updateModalFavorite() {
+    if (state.selectedId === null) return;
+
+    const isFavorite =
+        state.favorites.includes(state.selectedId);
+
+    const button = $("modalFavorite");
+
+    button.setAttribute(
+        "aria-pressed",
+        String(isFavorite)
+    );
+
+    button.innerHTML = isFavorite
+        ? `${icon("heart-fill")} Remove from favorites`
+        : `${icon("heart")} Save to favorites`;
+}
+
+function updateModalItinerary() {
+    if (state.selectedId === null) return;
+
+    const added =
+        state.itinerary.includes(state.selectedId);
+
+    const button = $("modalAddItinerary");
+
+    button.setAttribute(
+        "aria-disabled",
+        String(added)
+    );
+
+    button.innerHTML = added
+        ? `${icon("check-lg")} In your itinerary`
+        : `${icon("plus-lg")} Add to itinerary`;
+}
+
+function confirmAction({
+    title,
+    message,
+    okLabel,
+    onConfirm
+}) {
+    if (typeof bootstrap === "undefined") {
+        onConfirm();
+        return;
+    }
+
+    state.pendingConfirm = onConfirm;
+
+    $("confirmTitle").textContent = title;
+    $("confirmMessage").textContent = message;
+    $("confirmOk").textContent = okLabel || "Confirm";
+
+    showModal("confirmModal");
+}
+
+let toastInstance = null;
+
+function showToast(message, isWarning = false) {
+    const element = $("appToast");
+
+    $("toastMessage").textContent = message;
+
+    element.classList.toggle(
+        "is-warning",
+        isWarning
+    );
+
+    $("toastIcon").className =
+        `bi ${isWarning
+            ? "bi-exclamation-circle-fill"
+            : "bi-check-circle-fill"
+        }`;
+
+    if (typeof bootstrap === "undefined") return;
+
+    if (!toastInstance) {
+        toastInstance = bootstrap.Toast.getOrCreateInstance(
+            element,
+            { delay: 3200 }
+        );
+    }
+
+    toastInstance.show();
+}
 
 /* ==========================================
-   16. NAVIGATION EFFECTS
+   8. EVENT WIRING
    ========================================== */
 
 function setupNavigation() {
+    const navbar = $("mainNavbar");
 
-    const navbar = document.getElementById("mainNavbar");
+    const links = [
+        ...document.querySelectorAll(".navbar-nav .nav-link")
+    ];
 
-    window.addEventListener("scroll", () => {
+    const menu = $("navbarMenu");
 
-        navbar.classList.toggle("scrolled", window.scrollY > 30);
+    const updateNavbar = () => {
+        navbar.classList.toggle(
+            "scrolled",
+            window.scrollY > 30
+        );
+    };
 
-    });
+    window.addEventListener(
+        "scroll",
+        updateNavbar,
+        { passive: true }
+    );
 
-    // Close mobile navigation after selecting a link
-    document.querySelectorAll(".navbar-nav .nav-link, .nav-cta")
-        .forEach(link => {
+    updateNavbar();
 
-            link.addEventListener("click", () => {
-
-                const menu = document.getElementById("navbarMenu");
-
-                if (menu.classList.contains("show")) {
-
-                    bootstrap.Collapse.getOrCreateInstance(menu).hide();
-
-                }
-
-            });
-
+    document.querySelectorAll(
+        ".navbar-nav .nav-link"
+    ).forEach(item => {
+        item.addEventListener("click", () => {
+            if (
+                menu.classList.contains("show") &&
+                typeof bootstrap !== "undefined"
+            ) {
+                bootstrap.Collapse
+                    .getOrCreateInstance(menu)
+                    .hide();
+            }
         });
-}
-
-
-/* ==========================================
-   17. TOAST NOTIFICATIONS
-   ========================================== */
-
-let appToast;
-
-
-function setupBootstrapToast() {
-
-    const toastElement = document.getElementById("appToast");
-
-    appToast = bootstrap.Toast.getOrCreateInstance(toastElement, {
-        delay: 2500
     });
-}
 
+    if ("IntersectionObserver" in window) {
+        const observer = new IntersectionObserver(
+            entries => {
+                entries.forEach(entry => {
+                    if (!entry.isIntersecting) return;
 
-function showToast(message) {
+                    links.forEach(link => {
+                        const active =
+                            link.getAttribute("href") ===
+                            `#${entry.target.id}`;
 
-    document.getElementById("toastMessage").textContent = message;
+                        link.classList.toggle(
+                            "active",
+                            active
+                        );
 
-    if (appToast) {
-        appToast.show();
-    } else {
-        alert(message);
+                        if (active) {
+                            link.setAttribute(
+                                "aria-current",
+                                "true"
+                            );
+                        } else {
+                            link.removeAttribute("aria-current");
+                        }
+                    });
+                });
+            },
+            {
+                rootMargin: "-40% 0px -55% 0px"
+            }
+        );
+
+        links.forEach(link => {
+            const section = document.querySelector(
+                link.getAttribute("href")
+            );
+
+            if (section) observer.observe(section);
+        });
     }
 }
 
+function handleAction(event) {
+    const element = event.target.closest("[data-action]");
+
+    if (!element || element.disabled) return;
+
+    const action = element.dataset.action;
+    const id = Number(element.dataset.id);
+
+    switch (action) {
+        case "toggle-favorite":
+            toggleFavorite(id);
+
+            refocus(
+                `[data-action="toggle-favorite"][data-id="${id}"]`
+            );
+            break;
+
+        case "remove-favorite":
+            toggleFavorite(id);
+            break;
+
+        case "open-details":
+            openDestinationDetails(id);
+            break;
+
+        case "add-itinerary":
+            addToItinerary(id);
+
+            refocus(
+                `[data-action="open-details"][data-id="${id}"]`
+            );
+            break;
+
+        case "remove-itinerary":
+            removeFromItinerary(id);
+            break;
+
+        case "move-up":
+        case "move-down": {
+            moveItineraryItem(
+                id,
+                action === "move-up" ? -1 : 1
+            );
+
+            const opposite =
+                action === "move-up"
+                    ? "move-down"
+                    : "move-up";
+
+            refocus(
+                `[data-action="${action}"][data-id="${id}"]:not(:disabled)`,
+                `[data-action="${opposite}"][data-id="${id}"]`
+            );
+
+            break;
+        }
+
+        case "clear-itinerary":
+            clearItinerary();
+            break;
+
+        case "save-trip":
+            saveCurrentTrip();
+            break;
+
+        case "load-trip":
+            loadSavedTrip(id);
+            break;
+
+        case "delete-trip":
+            deleteSavedTrip(id);
+            break;
+
+        case "clear-search":
+            state.search = "";
+            $("searchInput").value = "";
+
+            renderDestinations();
+
+            $("searchInput").focus();
+            break;
+
+        case "reset-filters":
+            resetFilters();
+            break;
+
+        default:
+            break;
+    }
+}
+
+/* Keep keyboard focus after a list re-renders. */
+
+function refocus(primary, fallback) {
+    const target =
+        document.querySelector(primary) ||
+        (fallback && document.querySelector(fallback));
+
+    if (target) {
+        target.focus({
+            preventScroll: true
+        });
+    }
+}
+
+function setupEventListeners() {
+    document.addEventListener(
+        "click",
+        handleAction
+    );
+
+    $("searchInput").addEventListener(
+        "input",
+        debounce(event => {
+            state.search = event.target.value;
+            renderDestinations();
+        }, 150)
+    );
+
+    $("searchInput").addEventListener(
+        "input",
+        event => {
+            $("clearSearch").hidden =
+                event.target.value === "";
+        }
+    );
+
+    $("municipalityFilter").addEventListener(
+        "change",
+        event => {
+            state.municipality = event.target.value;
+            renderDestinations();
+        }
+    );
+
+    $("categoryFilter").addEventListener(
+        "change",
+        event => {
+            setCategory(event.target.value);
+        }
+    );
+
+    document.querySelectorAll(
+        ".category-chip"
+    ).forEach(chip => {
+        chip.addEventListener("click", () => {
+            setInterest(chip.dataset.interest);
+        });
+    });
+
+    $("tripTitle").addEventListener(
+        "input",
+        debounce(event => {
+            writeStorage(
+                storageKey("tripTitle"),
+                event.target.value
+            );
+        }, 300)
+    );
+
+    $("plannerSearch").addEventListener(
+        "input",
+        debounce(renderPlannerDestinations, 150)
+    );
+
+    $("modalFavorite").addEventListener(
+        "click",
+        () => {
+            if (state.selectedId !== null) {
+                toggleFavorite(state.selectedId);
+            }
+        }
+    );
+
+    $("modalAddItinerary").addEventListener(
+        "click",
+        () => {
+            if (
+                state.selectedId !== null &&
+                !state.itinerary.includes(state.selectedId)
+            ) {
+                addToItinerary(state.selectedId);
+            }
+        }
+    );
+
+    $("confirmOk").addEventListener(
+        "click",
+        () => {
+            const callback = state.pendingConfirm;
+
+            state.pendingConfirm = null;
+
+            hideModal("confirmModal");
+
+            if (typeof callback === "function") {
+                callback();
+            }
+        }
+    );
+}
 
 /* ==========================================
-   18. BASIC HTML ESCAPING
+   9. START-UP
    ========================================== */
 
-function escapeHTML(value) {
+async function loadData() {
+    const grid = $("destinationGrid");
 
-    return String(value ?? "").replace(/[&<>"']/g, character => {
+    try {
+        const response = await fetch(DATA_URL);
 
-        const characters = {
-            "&": "&amp;",
-            "<": "&lt;",
-            ">": "&gt;",
-            '"': "&quot;",
-            "'": "&#39;"
-        };
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
 
-        return characters[character];
-    });
+        const data = await response.json();
+
+        const destinations =
+            Array.isArray(data)
+                ? data
+                : data.destinations;
+
+        if (!Array.isArray(destinations)) {
+            throw new Error(
+                "destinations.json has no destinations list."
+            );
+        }
+
+        state.destinations = destinations;
+
+        state.dataLoaded = true;
+
+    } catch (error) {
+        console.error("Destination loading error:", error);
+
+        grid.innerHTML = `
+            <div class="saved-empty" role="alert">
+                ${icon("exclamation-circle")}
+
+                <strong>
+                    Destination data could not be loaded.
+                </strong><br>
+
+                Open this project with VS Code Live Server
+                (or any local web server) so the browser
+                can read destinations.json, and check that
+                the file is in the same folder as index.html.
+            </div>
+        `;
+    }
 }
+
+async function init() {
+    setupNavigation();
+
+    setupEventListeners();
+
+    await loadData();
+
+    loadSavedData();
+
+    renderAll();
+}
+
+document.addEventListener(
+    "DOMContentLoaded",
+    init
+);

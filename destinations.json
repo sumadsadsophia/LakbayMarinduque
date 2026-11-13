@@ -1,102 +1,403 @@
-
-[
-  {
-    "id": 1,
-    "name": "Boac Cathedral",
-    "municipality": "Boac",
-    "category": "Heritage",
-    "shortDescription": "A historic church that stands as an important religious and cultural landmark in Marinduque.",
-    "description": "The Immaculate Conception Cathedral is a significant religious landmark in Boac. Its historic presence and architecture make it an important part of the town's heritage.",
-    "background": "The cathedral is associated with the religious history and community traditions of Boac.",
-    "travelInfo": "Located in the town center of Boac. Visitors should observe proper behavior and respect religious activities when visiting.",
-    "image": "https://images.unsplash.com/photo-1548013146-72479768bada?w=1000"
-  },
-  {
-    "id": 2,
-    "name": "Poctoy White Beach",
-    "municipality": "Torrijos",
-    "category": "Beach",
-    "shortDescription": "A popular coastal destination known for its shoreline and views of the surrounding sea.",
-    "description": "Poctoy White Beach is a well-known beach destination in Torrijos where visitors can enjoy the coastal scenery and spend time by the sea.",
-    "background": "The beach is one of the destinations associated with Marinduque's coastal tourism.",
-    "travelInfo": "Located in Torrijos. Check local weather, beach conditions, entrance arrangements, and available facilities before visiting.",
-    "image": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1000"
-  },
-  {
-    "id": 3,
-    "name": "Maniwaya Island",
-    "municipality": "Santa Cruz",
-    "category": "Island",
-    "shortDescription": "An island destination known for its coastal scenery and beach experiences.",
-    "description": "Maniwaya Island is a recognized island destination in Santa Cruz. It offers visitors opportunities to appreciate island landscapes and coastal surroundings.",
-    "background": "The island forms part of the province's island and coastal tourism attractions.",
-    "travelInfo": "Travel arrangements may involve boat transportation. Confirm departure schedules, weather conditions, and local arrangements before traveling.",
-    "image": "https://images.unsplash.com/photo-1510414842594-a61c69b5ae57?w=1000"
-  },
-  {
-    "id": 4,
-    "name": "Tres Reyes Islands",
-    "municipality": "Gasan",
-    "category": "Island",
-    "shortDescription": "A group of islands associated with the coastal scenery of Gasan.",
-    "description": "The Tres Reyes Islands are a group of islands off the coast of Gasan. They are known for their island scenery and marine environment.",
-    "background": "The islands are named after the Three Kings and form part of the coastal identity of Gasan.",
-    "travelInfo": "Boat arrangements are needed to visit the islands. Check local boat availability, weather conditions, and applicable visitor rules.",
-    "image": "https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=1000"
-  },
-  {
-    "id": 5,
-    "name": "Moriones Festival",
-    "municipality": "Boac",
-    "category": "Culture",
-    "shortDescription": "A famous Holy Week tradition featuring colorful Morion masks and cultural performances.",
-    "description": "The Moriones Festival is one of Marinduque's best-known cultural traditions. Participants wear Morion masks inspired by Roman soldiers as part of Holy Week observances.",
-    "background": "The Moryonan tradition combines religious devotion, local artistry, community participation, and cultural heritage.",
-    "travelInfo": "Festival activities are associated with Holy Week. Check the official local schedule and event announcements before planning a visit.",
-    "image": "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=1000"
-  },
-  {
-    "id": 6,
-    "name": "Bathala Caves",
-    "municipality": "Santa Cruz",
-    "category": "Nature",
-    "shortDescription": "A natural cave attraction associated with the natural landscape of Santa Cruz.",
-    "description": "Bathala Caves is a natural attraction in Santa Cruz that can interest visitors who want to learn more about Marinduque's natural environment.",
-    "background": "Natural cave formations contribute to the province's variety of nature-based attractions.",
-    "travelInfo": "Confirm local access, safety requirements, visitor arrangements, and whether guided visits are available before traveling.",
-    "image": "https://images.unsplash.com/photo-1518837695005-2083093ee35b?w=1000"
-  },
-  {
-    "id": 7,
-    "name": "Gasan Church",
-    "municipality": "Gasan",
-    "category": "Heritage",
-    "shortDescription": "A religious landmark connected to the history and community life of Gasan.",
-    "description": "Gasan's historic church is a place of religious and community significance. It offers visitors an opportunity to appreciate the town's local heritage.",
-    "background": "Churches are important parts of the historical and cultural landscape of many communities in Marinduque.",
-    "travelInfo": "Located in Gasan. Check local access and religious service schedules before visiting.",
-    "image": "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?w=1000"
-  },
-  {
-    "id": 8,
-    "name": "Buenavista Coastal Area",
-    "municipality": "Buenavista",
-    "category": "Nature",
-    "shortDescription": "Explore the coastal scenery and natural surroundings of Buenavista.",
-    "description": "Buenavista offers coastal and rural scenery for visitors interested in experiencing the natural surroundings of Marinduque.",
-    "background": "The municipality contributes to the province's varied landscapes and community-based tourism experiences.",
-    "travelInfo": "Check the exact destination, local access arrangements, weather, and available facilities before visiting.",
-    "image": "https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=1000"
-  },
-  {
-    "id": 9,
-    "name": "Mogpog Heritage and Town Center",
-    "municipality": "Mogpog",
-    "category": "Heritage",
-    "shortDescription": "Discover the town center and cultural character of Mogpog.",
-    "description": "Mogpog offers visitors a chance to explore its town center and learn about the community's local history and traditions.",
-    "background": "Mogpog is one of the six municipalities that contribute to Marinduque's cultural identity.",
-    "travelInfo": "Explore the town center and verify the locations of specific heritage sites with local tourism information.",
-    "image": "https://images.unsplash.com/photo-1518005020951-eccb494ad742?w=1000"
-  }
-]
+{
+  "destinations": [
+    {
+      "id": 1,
+      "name": "Boac Cathedral",
+      "municipality": "Boac",
+      "category": "Heritage",
+      "interests": [
+        "History and heritage"
+      ],
+      "locationDetail": "Town center",
+      "shortDescription": "A fortress-like church on elevated ground in the heart of Boac.",
+      "description": "A prominent church on elevated ground in Boac. Its thick masonry and fortress-like appearance are among its most recognizable architectural features. The National Museum of the Philippines declared it an Important Cultural Property in 2018.",
+      "background": "The provincial tourism listing says construction began in 1792 and describes the church as earthquake-Baroque in design. Local accounts connect it with refuge during pirate raids and with devotion to the Immaculate Conception, known locally as Ina ng Biglang Awa. Other sources give earlier dates, so treat the founding date as approximate.",
+      "access": "In the town center of Boac, generally reached by local road transport or on foot from nearby central areas. Visitors should respect worship services and church rules.",
+      "confirm": "Mass schedules, visiting hours, photography rules and access during religious events. The exact barangay is not confirmed here, so ask locally.",
+      "highlights": [
+        "Thick masonry, fortress-like walls",
+        "Elevated setting",
+        "Important Cultural Property (2018)"
+      ],
+      "image": "images/boac-cathedral.jpg",
+      "imageCredit": ""
+    },
+    {
+      "id": 2,
+      "name": "Boac Town Plaza, Casa Real and National Museum",
+      "municipality": "Boac",
+      "category": "Heritage",
+      "interests": [
+        "History and heritage"
+      ],
+      "locationDetail": "Central Boac",
+      "shortDescription": "Heritage and civic sites in the provincial capital, including the National Museum's Marinduque branch.",
+      "description": "A group of heritage and civic sites in the provincial capital. The town plaza, Casa Real and the National Museum give visitors a way to learn about local history and community life.",
+      "background": "The National Museum's Marinduque branch presents the province's cultural heritage, including ethnographic collections, marine archaeology exhibits and historical artifacts. It is housed in a restored Spanish colonial building and has featured the exhibit Submerged History: The Marinduque Shipwrecks.",
+      "access": "These sites are in central Boac and can be visited as part of a town-center heritage walk, reached by road.",
+      "confirm": "Museum opening days and hours, current exhibits, entry arrangements, and whether any galleries are temporarily closed.",
+      "highlights": [
+        "Town-center heritage walk",
+        "National Museum, Marinduque branch",
+        "Marine archaeology exhibits"
+      ],
+      "image": "images/boac-plaza-casa-real.jpg",
+      "imageCredit": ""
+    },
+    {
+      "id": 3,
+      "name": "Gasan Church (St. Joseph Parish Church)",
+      "municipality": "Gasan",
+      "category": "Heritage",
+      "interests": [
+        "History and heritage"
+      ],
+      "locationDetail": "Town center",
+      "shortDescription": "The parish church of Gasan, with interior artwork by local artists.",
+      "description": "The parish church is a central landmark in Gasan and an important place for worship and community gatherings. The provincial tourism listing also notes interior artwork by local artists.",
+      "background": "The church reflects the town's religious and community history. The provincial tourism page identifies it as St. Joseph Parish Church.",
+      "access": "In the town center of Gasan, reached by road. Visitors should observe appropriate conduct while services are taking place.",
+      "confirm": "Mass times, access to the interior, and photography rules with the parish.",
+      "highlights": [
+        "Interior artwork by local artists",
+        "Town-center landmark",
+        "Active parish church"
+      ],
+      "image": "images/gasan-church.jpg",
+      "imageCredit": ""
+    },
+    {
+      "id": 4,
+      "name": "Moriones Festival",
+      "municipality": "Boac",
+      "category": "Culture",
+      "interests": [
+        "Culture and community"
+      ],
+      "locationDetail": "Held in several towns, including Boac, Gasan and Mogpog",
+      "shortDescription": "Marinduque's Holy Week tradition of masked Roman soldiers.",
+      "description": "During Holy Week, participants in Marinduque wear carved wooden moryon masks and Roman soldier costumes and parade through town. The tradition re-enacts the story of Longinus, the Roman centurion who, according to the legend, regained his sight and converted. The story ends with his beheading, known as the Pugutan.",
+      "background": "The Moriones is a penitential, religious observance rather than a party, so visitors are expected to be respectful when watching and taking photographs. It is held in several Marinduque towns.",
+      "access": "Held in town centers such as Boac, Gasan and Mogpog, which are reached by road.",
+      "confirm": "The official Holy Week schedule and venues from the Provincial Tourism Office, plus accommodation and transport availability.",
+      "highlights": [
+        "Carved moryon masks",
+        "Roman soldier costumes",
+        "Holy Week tradition"
+      ],
+      "image": "images/moriones-festival.jpg",
+      "imageCredit": ""
+    },
+    {
+      "id": 5,
+      "name": "Poctoy White Beach",
+      "municipality": "Torrijos",
+      "category": "Beach",
+      "interests": [
+        "Beaches and sandbars"
+      ],
+      "locationDetail": "Barangay Poctoy",
+      "shortDescription": "A long white-sand mainland beach in Torrijos with views toward Mt. Malindig.",
+      "description": "A well-known mainland beach with a long stretch of light-colored sand and views toward Mount Malindig. The provincial tourism page describes it as the only white-sand beach on mainland Marinduque.",
+      "background": "The beach is part of the coastal landscape of Torrijos. Its setting beneath the profile of Mount Malindig is one of the commonly noted features of the site.",
+      "access": "Reached by road from the town proper of Torrijos. No boat is needed.",
+      "confirm": "Current beach access, entrance or parking arrangements, local swimming advisories, weather and sea conditions.",
+      "highlights": [
+        "Long stretch of light-colored sand",
+        "Views toward Mt. Malindig",
+        "Mainland beach"
+      ],
+      "image": "images/poctoy-white-beach.jpg",
+      "imageCredit": ""
+    },
+    {
+      "id": 6,
+      "name": "Maniwaya Island",
+      "municipality": "Santa Cruz",
+      "category": "Island",
+      "interests": [
+        "Beaches and sandbars",
+        "Island hopping"
+      ],
+      "locationDetail": "Barangay Maniwaya",
+      "shortDescription": "An island off Santa Cruz known for its beaches and clear coastal waters.",
+      "description": "An island destination known for its beaches and clear coastal waters. It is also a common base for visiting nearby Palad Sandbar and other island-hopping stops.",
+      "background": "Maniwaya is one of Santa Cruz's island barangays. Government information has described it as a geographically isolated island community; a DOST-supported solar-powered water-pumping project was installed there in 2021.",
+      "access": "Boat needed. The commonly described route is a land trip to Buyabod Port in Santa Cruz, then a motorized banca crossing. The Balanacan ferry gateway is not the Buyabod departure point.",
+      "confirm": "Boat departures, sea conditions, return arrangements, and resort or day-use rules, with the port or your accommodation.",
+      "highlights": [
+        "Beaches and clear coastal waters",
+        "Base for island hopping",
+        "Boat from Buyabod Port"
+      ],
+      "image": "images/maniwaya-island.jpg",
+      "imageCredit": ""
+    },
+    {
+      "id": 7,
+      "name": "Palad Sandbar",
+      "municipality": "Santa Cruz",
+      "category": "Island",
+      "interests": [
+        "Beaches and sandbars",
+        "Island hopping"
+      ],
+      "locationDetail": "Off the coast of Maniwaya Island",
+      "shortDescription": "A strip of pale sand whose visible area changes with the tide.",
+      "description": "A strip of pale sand offshore from Maniwaya Island. The exposed sand area changes with the tide and may be covered by water when the tide rises.",
+      "background": "It is a natural coastal feature shaped by sediment movement and tidal conditions. Travel sources describe it as a sandbar rather than a permanent beach.",
+      "access": "Boat needed. Usually visited by banca on an island-hopping trip from Buyabod Port, Santa Cruz. It is not a road-access destination.",
+      "confirm": "The day's tide and sea conditions with the boat operator, whether landing is permitted, and any local environmental or landing arrangements.",
+      "highlights": [
+        "Tide-dependent sand",
+        "Island-hopping stop",
+        "Boat access only"
+      ],
+      "image": "images/palad-sandbar.jpg",
+      "imageCredit": ""
+    },
+    {
+      "id": 8,
+      "name": "Natangco Island",
+      "municipality": "Mogpog",
+      "category": "Island",
+      "interests": [
+        "Beaches and sandbars",
+        "Island hopping"
+      ],
+      "locationDetail": "Barangay Silangan",
+      "shortDescription": "A small islet with a short stretch of powdery white sand, reached by boat.",
+      "description": "An offshore islet of about eight hectares with a short stretch of powdery white sand. The Mogpog municipal government describes it as a diver site known for corals and marine life. Local listings describe it as quiet and relatively undeveloped, with limited facilities.",
+      "background": "The islet is private property. The Mogpog municipal government lists it among its local attractions.",
+      "access": "Boat needed. Reached by a short banca crossing from the northern coast of Marinduque; a local guide identifies Balanacan Port as the nearest hub.",
+      "confirm": "Access arrangements, because the islet is private property; boat and return-pickup arrangements; weather, sea conditions and local restrictions. Bring food, drinking water, sun protection and a bag to carry rubbish out.",
+      "highlights": [
+        "Powdery white sand",
+        "Corals and marine life",
+        "Boat from the Balanacan area"
+      ],
+      "image": "images/natangco-island.jpg",
+      "imageCredit": ""
+    },
+    {
+      "id": 9,
+      "name": "Tres Reyes Islands",
+      "municipality": "Gasan",
+      "category": "Island",
+      "interests": [
+        "Island hopping"
+      ],
+      "locationDetail": "Off the coast of Gasan, near Barangay Pinggan",
+      "shortDescription": "Three offshore islands named Gaspar, Melchor and Baltazar.",
+      "description": "A group of three offshore islands named Gaspar, Melchor and Baltazar. Published travel accounts describe beaches, coastal scenery and marine environments across the island group.",
+      "background": "Tres Reyes means \"Three Kings\" and refers to the biblical Magi. Travel accounts describe Gaspar as having a beach cove, while Melchor and Baltazar have different coastal and marine features.",
+      "access": "Boat needed from the Gasan coast; Pinggan is identified as a departure area in a current local travel guide. Boat access depends on sea conditions.",
+      "confirm": "The exact boat departure point, landing permission, sea conditions, and whether overnight stays or camping are currently allowed.",
+      "highlights": [
+        "Three islands: Gaspar, Melchor, Baltazar",
+        "Beach cove on Gaspar",
+        "Marine tourism"
+      ],
+      "image": "images/tres-reyes-islands.jpg",
+      "imageCredit": ""
+    },
+    {
+      "id": 10,
+      "name": "Ungab Rock Formation",
+      "municipality": "Santa Cruz",
+      "category": "Island",
+      "interests": [
+        "Island hopping"
+      ],
+      "locationDetail": "Mongpong Island",
+      "shortDescription": "A natural rock arch on Mongpong Island, a stop on island-hopping routes.",
+      "description": "A naturally formed rock arch on the coast of Mongpong Island. The arch is a popular stop on island-hopping routes around the Santa Cruz island group.",
+      "background": "The arch is a geological feature shaped by coastal erosion over time. Travel sources place it on the eastern coast of Mongpong Island, not on Maniwaya.",
+      "access": "Boat needed, commonly as part of an island-hopping trip arranged from Buyabod Port, Santa Cruz.",
+      "confirm": "Sea conditions, landing access and local boat arrangements. Rocks around the formation may be uneven, so follow the boat operator's safety directions.",
+      "highlights": [
+        "Natural rock arch",
+        "Eastern coast of Mongpong Island",
+        "Island-hopping stop"
+      ],
+      "image": "images/ungab-rock-formation.jpg",
+      "imageCredit": ""
+    },
+    {
+      "id": 11,
+      "name": "Bathala Caves",
+      "municipality": "Santa Cruz",
+      "category": "Nature",
+      "interests": [
+        "Caves"
+      ],
+      "locationDetail": "Barangay Ipil, Sitio Bathala",
+      "shortDescription": "A group of caves in Santa Cruz with a place in local folklore.",
+      "description": "A group of caves in the Santa Cruz area, described by travel sources as containing limestone chambers and varied cave features.",
+      "background": "The caves have cultural significance in local folklore. The Marinduque travel guide records a belief associating them with Amang Bathala, the supreme deity in ancient Tagalog belief. This is folklore and belief, not a verified archaeological conclusion.",
+      "access": "Reached by land to Barangay Ipil, then a locally arranged approach. A local guide and barangay coordination are recommended in the cited guide.",
+      "confirm": "Whether visits are currently allowed, which sections are open, and whether a guide is required. Cave conditions can change after heavy rain.",
+      "highlights": [
+        "Limestone chambers",
+        "Folklore of Amang Bathala",
+        "Local guide recommended"
+      ],
+      "image": "images/bathala-caves.jpg",
+      "imageCredit": ""
+    },
+    {
+      "id": 12,
+      "name": "Bagumbungan Cave",
+      "municipality": "Santa Cruz",
+      "category": "Nature",
+      "interests": [
+        "Caves"
+      ],
+      "locationDetail": "Barangay San Isidro / Bagumbungan area (confirm the exact registration point locally)",
+      "shortDescription": "An underground-river cave system. Reported closed to visitors in 2025.",
+      "description": "A cave system described in travel references as having limestone formations, an underground river and waterfalls. One guide reports a length of about 1.9 kilometres.",
+      "background": "The cave is a natural geological feature. No specific historical origin is established in the sources used for this guide.",
+      "access": "Reached by land within Santa Cruz, then a local approach to the cave area. Published guides describe registration and a local guide as part of the visit.",
+      "confirm": "Whether the cave is open. A travel article published in October 2025 reported it closed to visitors at that time, and its present status is not confirmed. Check with the municipal tourism office first, and never enter a cave without authorized local guidance.",
+      "highlights": [
+        "Underground river",
+        "Limestone formations",
+        "Reported closed in 2025"
+      ],
+      "image": "images/bagumbungan-cave.jpg",
+      "imageCredit": ""
+    },
+    {
+      "id": 13,
+      "name": "Mt. Malindig",
+      "municipality": "Buenavista",
+      "category": "Nature",
+      "interests": [
+        "Mountains and springs"
+      ],
+      "locationDetail": "Sihi trail, cited as one jump-off area",
+      "shortDescription": "The highest mountain in Marinduque, a stratovolcano with forested slopes.",
+      "description": "The highest mountain in Marinduque. Travel references describe it as a stratovolcano with forested sections and varied vegetation.",
+      "background": "Mount Malindig is a major physical landmark of the province. Its volcanic character is also associated in travel references with the sulfur springs in the surrounding area.",
+      "access": "By land to a locally designated trailhead, then a guided mountain route. The provincial guide identifies the Sihi trail in Buenavista as one jump-off point.",
+      "confirm": "This is a mountain route, not a casual roadside stop. Check trail status, permits, guide arrangements, weather and any local restrictions with the tourism office.",
+      "highlights": [
+        "Highest mountain in Marinduque",
+        "Stratovolcano",
+        "Guided mountain route"
+      ],
+      "image": "images/mt-malindig.jpg",
+      "imageCredit": ""
+    },
+    {
+      "id": 14,
+      "name": "Malbog Sulfuric Hot Spring",
+      "municipality": "Buenavista",
+      "category": "Nature",
+      "interests": [
+        "Mountains and springs"
+      ],
+      "locationDetail": "Barangay Malbog",
+      "shortDescription": "A hot spring at the base of Mt. Malindig with naturally warm, sulfur-scented water.",
+      "description": "A hot-spring destination at the base of Mount Malindig. Its naturally warm water is associated with sulfur, which gives it a distinctive smell.",
+      "background": "The hot spring is part of the natural landscape around Mount Malindig. A national tourism feature recounts that a Marinduque pharmacist in the 1900s bottled small amounts of the water and sold it in Manila as a remedy. This is a historical anecdote, not medical advice.",
+      "access": "Reached by road to Barangay Malbog in Buenavista. The site is commonly described as a resort or managed spring area.",
+      "confirm": "Current opening status, pool access, entrance arrangements and facility rules. Claims about therapeutic effects are not proven medical benefits.",
+      "highlights": [
+        "Naturally warm water",
+        "Sulfur smell",
+        "Foot of Mt. Malindig"
+      ],
+      "image": "images/malbog-sulfur-spring.jpg",
+      "imageCredit": ""
+    },
+    {
+      "id": 15,
+      "name": "Paadjao Cascades",
+      "municipality": "Mogpog",
+      "category": "Nature",
+      "interests": [
+        "Waterfalls"
+      ],
+      "locationDetail": "Barangay Bocboc",
+      "shortDescription": "A cascade over rock into a natural pool, surrounded by vegetation.",
+      "description": "A waterfall site described by the Mogpog municipal government and travel references as a cascade flowing over rock into a natural pool, surrounded by vegetation.",
+      "background": "The site is a natural water feature within the forested landscape of Bocboc. No specific historical event is established in the sources used for this guide.",
+      "access": "Reached from the barangay road by a short uphill walk, according to the municipal government. Road conditions and access may vary.",
+      "confirm": "Trail condition, water level, local guide requirements, and whether access is open after heavy rain.",
+      "highlights": [
+        "Cascade over rock",
+        "Natural pool",
+        "Short uphill walk"
+      ],
+      "image": "images/paadjao-cascades.jpg",
+      "imageCredit": ""
+    },
+    {
+      "id": 16,
+      "name": "Kawa-Kawa Falls",
+      "municipality": "Santa Cruz",
+      "category": "Nature",
+      "interests": [
+        "Waterfalls"
+      ],
+      "locationDetail": "Barangay Bangcuangan",
+      "shortDescription": "A waterfall area known for kettle-like rock pools.",
+      "description": "A waterfall area known for rock pools described as resembling a kawa, a large cooking cauldron. The name refers to the shape of the pools.",
+      "background": "The name comes from the Filipino word kawa, for a large cauldron. It is a descriptive name based on the shape of the natural rock pools.",
+      "access": "Reached by land within Santa Cruz, then a local approach to the falls. Check the exact route and guide arrangements with the barangay or tourism office.",
+      "confirm": "Access, trail condition, water level, and whether swimming is permitted on the day of your visit.",
+      "highlights": [
+        "Kettle-like rock pools",
+        "Named after the kawa",
+        "Reached by land"
+      ],
+      "image": "images/kawa-kawa-falls.jpg",
+      "imageCredit": ""
+    },
+    {
+      "id": 17,
+      "name": "Luzon Datum of 1911",
+      "municipality": "Mogpog",
+      "category": "Heritage",
+      "interests": [
+        "History and heritage"
+      ],
+      "locationDetail": "Barangay Hinanggayon, near the Argao and Silangan boundaries",
+      "shortDescription": "A geodetic reference point historically used for mapping and surveying in the Philippines.",
+      "description": "A geodetic control point historically used as a primary reference for mapping and surveying in the Philippines. The marker is set on a rock outcrop in Mogpog.",
+      "background": "The Mogpog municipal government states that the U.S. Coast and Geodetic Survey established the marker in 1906, and that it became the first-order reference point known as the Luzon Datum of 1911. It is important to the history of Philippine geodesy and cartography.",
+      "access": "Reached by road toward the Balanacan / Hinanggayon area, then an uphill approach to the marker.",
+      "confirm": "Current access, road condition, and any local visitor procedures.",
+      "highlights": [
+        "Geodetic reference point",
+        "Established 1906",
+        "Uphill approach"
+      ],
+      "image": "images/luzon-datum-1911.jpg",
+      "imageCredit": ""
+    },
+    {
+      "id": 18,
+      "name": "Panuluyan Farmstay",
+      "municipality": "Santa Cruz",
+      "category": "Culture",
+      "interests": [
+        "Culture and community"
+      ],
+      "locationDetail": "Barangay Masalukot",
+      "shortDescription": "A community-run farmstay in the upland countryside of Santa Cruz.",
+      "description": "A community-run farmstay in the upland countryside of Santa Cruz. Its official website describes it as a farmstay rather than a resort, built around community hospitality, rural living and a cacao-growing operation, including a Seed to Sip cacao experience.",
+      "background": "The operator describes the project as community tourism involving partner farmer families. It chose kubo-style accommodation using familiar local materials such as bamboo and cogon. This is a rural accommodation concept, not a historical monument.",
+      "access": "Reached by land from Santa Cruz town proper; the operator places it about 16 km from the town plaza, in a remote barangay.",
+      "confirm": "Day-visit availability, booking requirements, activity schedules, and road and pickup arrangements, directly with Panuluyan. Published details can change.",
+      "highlights": [
+        "Community-run farmstay",
+        "Seed to Sip cacao experience",
+        "Kubo-style accommodation"
+      ],
+      "image": "images/panuluyan-farmstay.jpg",
+      "imageCredit": ""
+    }
+  ]
+}

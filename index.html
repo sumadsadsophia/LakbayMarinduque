@@ -1,797 +1,464 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 
     <title>Lakbay Marinduque | Discover the Heart of the Philippines</title>
+    <meta name="description" content="Explore Marinduque's beaches, islands, heritage churches, caves, festivals and food, then plan your own itinerary.">
+    <meta name="theme-color" content="#14363D">
 
-    <meta name="description"
-        content="Discover Marinduque's destinations, cultural heritage, local attractions, and plan your own island adventure.">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <meta name="theme-color" content="#f8f7f2">
-
-    <!-- Bootstrap 5 -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
-        rel="stylesheet">
-
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
 
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Playfair+Display:wght@500;600;700&display=swap"
-        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-
-    <!-- Custom CSS -->
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+    <a class="skip-link" href="#main">Skip to main content</a>
 
     <!-- ================= NAVIGATION ================= -->
-
-    <nav class="navbar navbar-expand-lg fixed-top" id="mainNavbar">
+    <nav class="navbar navbar-expand-lg fixed-top" id="mainNavbar" aria-label="Main navigation">
         <div class="container">
-
             <a class="navbar-brand" href="#home">
-                <span class="brand-mark">
-                    <i class="bi bi-compass-fill"></i>
-                </span>
-                Lakbay<span>Marinduque.</span>
+                <i class="bi bi-compass-fill" aria-hidden="true"></i>
+                Lakbay Marinduque
             </a>
 
-            <button class="navbar-toggler" type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#navbarMenu"
-                aria-controls="navbarMenu"
-                aria-expanded="false"
-                aria-label="Toggle navigation">
-
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                data-bs-target="#navbarMenu" aria-controls="navbarMenu"
+                aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
             <div class="collapse navbar-collapse" id="navbarMenu">
-
                 <ul class="navbar-nav ms-auto align-items-lg-center">
-
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#home">Home</a>
+                    <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#destinations">Destinations</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#planner">Trip planner</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#saved">My saved trips</a></li>
+                    <li class="nav-item ms-lg-2">
+                        <button type="button" class="nav-signin" aria-label="Sign in (visual placeholder only)">
+                            Sign in
+                        </button>
                     </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link" href="#destinations">Destinations</a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link" href="#culture">Culture & Heritage</a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link" href="#planner">Trip Planner</a>
-                    </li>
-
-                    <li class="nav-item">
-                        <a class="nav-link" href="#saved">My Saved Trips</a>
-                    </li>
-
-                    <li class="nav-item ms-lg-3">
-                        <a href="#destinations" class="nav-cta">
-                            Explore Marinduque
-                            <i class="bi bi-arrow-up-right"></i>
-                        </a>
-                    </li>
-
                 </ul>
             </div>
         </div>
     </nav>
 
+    <main id="main">
 
-    <!-- ================= HERO ================= -->
+        <!-- ================= HERO ================= -->
+        <header class="hero-section" id="home">
+            <img class="hero-image" src="images/hero.jpg" width="1600" height="1200" fetchpriority="high"
+                alt="Aerial view of a white-sand cove, turquoise water and a red pavilion on Natangco Island, Marinduque">
+            <div class="hero-shade" aria-hidden="true"></div>
 
-    <header class="hero-section" id="home">
-
-        <div class="hero-background"></div>
-        <div class="hero-shade"></div>
-
-        <div class="container hero-container">
-
-            <div class="hero-content">
-
-                <div class="hero-eyebrow">
-                    <span class="eyebrow-line"></span>
-                    MIMAROPA · PHILIPPINES
-                </div>
-
-                <p class="hero-small-title">
-                    YOUR JOURNEY STARTS HERE
-                </p>
-
-                <h1>
-                    Discover the<br>
-                    <span>Heart of the</span><br>
-                    Philippines.
-                </h1>
-
-                <p class="hero-description">
-                    From breathtaking island escapes to meaningful
-                    cultural traditions, discover the places and stories
-                    that make Marinduque unforgettable.
-                </p>
-
-                <div class="hero-actions">
-
-                    <a href="#destinations" class="btn-primary-custom">
-                        Explore Destinations
-                        <i class="bi bi-arrow-up-right"></i>
-                    </a>
-
-                    <a href="#planner" class="btn-text-light">
-                        Plan your journey
-                        <i class="bi bi-arrow-down-right"></i>
-                    </a>
-
-                </div>
-
-                <div class="hero-bottom-note">
-                    <i class="bi bi-geo-alt-fill"></i>
-                    A journey through six beautiful municipalities
-                </div>
-
-            </div>
-        </div>
-
-        <div class="hero-scroll">
-            <span>SCROLL TO DISCOVER</span>
-            <i class="bi bi-arrow-down"></i>
-        </div>
-
-        <div class="hero-index">
-            <span>01</span>
-            <span class="index-line"></span>
-            <span>MARINDUQUE</span>
-        </div>
-
-    </header>
-
-
-    <!-- ================= INTRODUCTION ================= -->
-
-    <section class="intro-section" id="introduction">
-
-        <div class="container">
-
-            <div class="intro-top">
-
-                <div>
-                    <p class="eyebrow">WELCOME TO MARINDUQUE</p>
-
-                    <h2 class="editorial-heading">
-                        More than a destination.<br>
-                        <span>A story waiting to be explored.</span>
-                    </h2>
-                </div>
-
-                <div class="intro-description">
-                    <p>
-                        Located in the heart of the Philippines,
-                        Marinduque offers a meaningful blend of natural
-                        beauty, local traditions, historical places,
-                        and unforgettable experiences.
+            <div class="container hero-container">
+                <div class="hero-content">
+                    <p class="hero-kicker">Discover the Heart of the Philippines</p>
+                    <h1>Lakbay<br>Marinduque</h1>
+                    <p class="hero-description">
+                        From heritage churches and Holy Week masks to white-sand coves, sandbars and caves,
+                        find the places worth visiting across six municipalities and plan your own trip.
                     </p>
-
-                    <a href="#destinations" class="underlined-link">
-                        Discover the island
-                        <i class="bi bi-arrow-right"></i>
+                    <a href="#destinations" class="btn-accent">
+                        Explore destinations <i class="bi bi-arrow-right" aria-hidden="true"></i>
                     </a>
                 </div>
-
             </div>
 
-            <div class="intro-statistics">
-
-                <div class="stat-item">
-                    <span class="stat-number">06</span>
-                    <span class="stat-label">Municipalities</span>
-                </div>
-
-                <div class="stat-item">
-                    <span class="stat-number">01</span>
-                    <span class="stat-label">Island Province</span>
-                </div>
-
-                <div class="stat-item">
-                    <span class="stat-number">∞</span>
-                    <span class="stat-label">Stories to Discover</span>
-                </div>
-
-                <div class="stat-note">
-                    <i class="bi bi-flower1"></i>
-                    Explore the beauty, culture, and heritage of Marinduque.
-                </div>
-
+            <div class="container hero-features-wrap">
+                <ul class="hero-features">
+                    <li>
+                        <i class="bi bi-search" aria-hidden="true"></i>
+                        <div><strong>Discover places</strong>
+                        <span>Search and filter by municipality, category and interest.</span></div>
+                    </li>
+                    <li>
+                        <i class="bi bi-info-circle" aria-hidden="true"></i>
+                        <div><strong>Know before you go</strong>
+                        <span>Description, location and general access for every place.</span></div>
+                    </li>
+                    <li>
+                        <i class="bi bi-map" aria-hidden="true"></i>
+                        <div><strong>Plan your trip</strong>
+                        <span>Add, remove and reorder the stops you want to visit.</span></div>
+                    </li>
+                    <li>
+                        <i class="bi bi-bookmark-heart" aria-hidden="true"></i>
+                        <div><strong>Save for later</strong>
+                        <span>Keep favorites and itineraries on this device.</span></div>
+                    </li>
+                </ul>
             </div>
-
-        </div>
-    </section>
+        </header>
 
 
-    <!-- ================= DESTINATION DIRECTORY ================= -->
+        <!-- ================= INTRODUCTION ================= -->
+        <section class="intro-section" id="introduction" aria-labelledby="introTitle">
+            <div class="container">
+                <div class="intro-top">
+                    <div>
+                        <p class="eyebrow">Welcome to Marinduque</p>
+                        <h2 class="editorial-heading" id="introTitle">
+                            A heart-shaped island with more than one festival to its name.
+                        </h2>
+                    </div>
+                    <div class="intro-description">
+                        <p>
+                            Marinduque is home to the Moriones Holy Week tradition, and also to white-sand
+                            beaches, island sandbars, caves, waterfalls, Mt. Malindig and heritage churches.
+                            Browse the places below, then build your own itinerary.
+                        </p>
+                        <a href="#destinations" class="underlined-link">
+                            Discover the island <i class="bi bi-arrow-right" aria-hidden="true"></i>
+                        </a>
+                    </div>
+                </div>
 
-    <section class="destination-section section-space" id="destinations">
-
-        <div class="container">
-
-            <div class="section-topline">
-                <span>01 / EXPLORE</span>
-                <span>THE DESTINATION DIRECTORY</span>
-            </div>
-
-            <div class="section-heading-row">
-
-                <div>
-                    <p class="eyebrow">FIND YOUR NEXT EXPERIENCE</p>
-
-                    <h2 class="section-title">
-                        Explore <span>Marinduque.</span>
-                    </h2>
-
-                    <p class="section-subtitle">
-                        Find beaches, heritage sites, natural attractions,
-                        and cultural experiences across the province.
+                <div class="intro-statistics">
+                    <div class="stat-item"><span class="stat-number" id="statMunicipalities">6</span><span class="stat-label">Municipalities</span></div>
+                    <div class="stat-item"><span class="stat-number" id="statDestinations">0</span><span class="stat-label">Places to visit</span></div>
+                    <p class="stat-note">
+                        <i class="bi bi-flower1" aria-hidden="true"></i>
+                        Boac, Mogpog, Gasan, Buenavista, Torrijos and Santa Cruz.
                     </p>
                 </div>
-
-                <div class="destination-total">
-                    <span id="destinationCount">0</span>
-                    <small>PLACES TO EXPLORE</small>
-                </div>
-
             </div>
+        </section>
 
 
-            <!-- SEARCH AND FILTERS -->
-
-            <div class="discovery-panel">
-
-                <div class="search-box">
-
-                    <i class="bi bi-search"></i>
-
-                    <input type="search"
-                        id="searchInput"
-                        class="form-control"
-                        placeholder="Search destinations, places, or experiences..."
-                        aria-label="Search destinations">
-
-                    <button type="button" id="clearSearch"
-                        class="clear-search" aria-label="Clear search">
-                        <i class="bi bi-x-lg"></i>
-                    </button>
-
+        <!-- ================= DESTINATION DIRECTORY ================= -->
+        <section class="destination-section section-space" id="destinations" aria-labelledby="destinationsTitle">
+            <div class="container">
+                <div class="section-heading-row">
+                    <div>
+                        <p class="eyebrow">Tourism and cultural directory</p>
+                        <h2 class="section-title" id="destinationsTitle">Explore Marinduque</h2>
+                        <p class="section-subtitle">
+                            Search by name, filter by municipality, category or interest, and open any place for
+                            location, general access and background.
+                        </p>
+                    </div>
+                    <div class="destination-total" aria-live="polite" aria-atomic="true">
+                        <span id="destinationCount">0</span>
+                        <small id="destinationCountLabel">places</small>
+                    </div>
                 </div>
 
-                <div class="filter-row">
-
-                    <div class="filter-control">
-                        <label for="municipalityFilter">Municipality</label>
-
-                        <select id="municipalityFilter" class="form-select">
-                            <option value="all">All Municipalities</option>
-                            <option value="Boac">Boac</option>
-                            <option value="Mogpog">Mogpog</option>
-                            <option value="Gasan">Gasan</option>
-                            <option value="Buenavista">Buenavista</option>
-                            <option value="Torrijos">Torrijos</option>
-                            <option value="Santa Cruz">Santa Cruz</option>
-                        </select>
+                <div class="discovery-panel" role="search">
+                    <div class="search-box">
+                        <i class="bi bi-search" aria-hidden="true"></i>
+                        <label for="searchInput" class="visually-hidden">Search destinations</label>
+                        <input type="search" id="searchInput" class="form-control"
+                            placeholder="Search places, towns or experiences, such as caves, waterfalls or churches"
+                            autocomplete="off">
+                        <button type="button" id="clearSearch" class="clear-search" hidden
+                            data-action="clear-search" aria-label="Clear search">
+                            <i class="bi bi-x-lg" aria-hidden="true"></i>
+                        </button>
                     </div>
 
-                    <div class="filter-control">
-                        <label for="categoryFilter">Category</label>
-
-                        <select id="categoryFilter" class="form-select">
-                            <option value="all">All Categories</option>
-                            <option value="Beach">Beaches</option>
-                            <option value="Island">Islands</option>
-                            <option value="Heritage">Heritage</option>
-                            <option value="Nature">Nature</option>
-                            <option value="Culture">Culture</option>
-                        </select>
-                    </div>
-
-                    <button type="button" id="resetFilters"
-                        class="reset-filter">
-                        <i class="bi bi-arrow-counterclockwise"></i>
-                        Reset filters
-                    </button>
-
-                </div>
-
-                <div class="quick-categories">
-
-                    <span>Explore by interest:</span>
-
-                    <button class="category-chip active"
-                        data-category="all">All places</button>
-
-                    <button class="category-chip"
-                        data-category="Beach">Beaches</button>
-
-                    <button class="category-chip"
-                        data-category="Island">Islands</button>
-
-                    <button class="category-chip"
-                        data-category="Heritage">Heritage</button>
-
-                    <button class="category-chip"
-                        data-category="Culture">Culture</button>
-
-                </div>
-
-            </div>
-
-
-            <!-- DESTINATION CARDS -->
-
-            <div class="destination-grid" id="destinationGrid">
-
-                <!-- Cards generated using JavaScript -->
-
-            </div>
-
-            <div id="noResults" class="no-results" hidden>
-
-                <div class="no-results-icon">
-                    <i class="bi bi-geo-alt"></i>
-                </div>
-
-                <h4>No destinations found</h4>
-
-                <p>
-                    Try another search term or change your filters
-                    to discover more places.
-                </p>
-
-                <button type="button" id="emptyReset"
-                    class="btn-main-custom">
-                    View all destinations
-                </button>
-
-            </div>
-
-        </div>
-    </section>
-
-
-    <!-- ================= CULTURE AND HERITAGE ================= -->
-
-    <section class="culture-section" id="culture">
-
-        <div class="culture-image">
-            <div class="culture-image-overlay"></div>
-
-            <div class="culture-image-caption">
-                <span>TRADITION · FAITH · IDENTITY</span>
-            </div>
-        </div>
-
-        <div class="culture-content">
-
-            <p class="eyebrow light-eyebrow">
-                A CULTURE WORTH DISCOVERING
-            </p>
-
-            <h2>
-                Where traditions<br>
-                <span>come alive.</span>
-            </h2>
-
-            <p>
-                Marinduque is known for its rich cultural heritage,
-                especially the Moriones Festival, a Holy Week tradition
-                featuring colorful Roman soldier masks and local
-                religious practices.
-            </p>
-
-            <p>
-                Discover the stories, artistry, and traditions
-                that continue to shape the identity of the island.
-            </p>
-
-            <a href="#destinations" class="culture-link">
-                Explore cultural destinations
-                <i class="bi bi-arrow-up-right"></i>
-            </a>
-
-            <div class="culture-decoration">M</div>
-
-        </div>
-    </section>
-
-
-    <!-- ================= ITINERARY PLANNER ================= -->
-
-    <section class="planner-section section-space" id="planner">
-
-        <div class="container">
-
-            <div class="section-topline">
-                <span>02 / PLAN</span>
-                <span>YOUR PERSONAL JOURNEY</span>
-            </div>
-
-            <div class="section-heading-row">
-
-                <div>
-                    <p class="eyebrow">MAKE YOUR OWN ADVENTURE</p>
-
-                    <h2 class="section-title">
-                        Plan your <span>journey.</span>
-                    </h2>
-
-                    <p class="section-subtitle">
-                        Choose destinations and arrange them
-                        into an itinerary that works for your trip.
-                    </p>
-                </div>
-
-                <div class="planner-icon">
-                    <i class="bi bi-map"></i>
-                </div>
-
-            </div>
-
-
-            <div class="planner-layout">
-
-                <!-- LEFT: DESTINATION SELECTION -->
-
-                <div class="planner-selection">
-
-                    <div class="planner-card-header">
-                        <div>
-                            <span class="step-label">STEP 01</span>
-                            <h4>Choose destinations</h4>
+                    <div class="filter-row">
+                        <div class="filter-control">
+                            <label for="municipalityFilter">Municipality</label>
+                            <select id="municipalityFilter" class="form-select">
+                                <option value="all">All municipalities</option>
+                                <option value="Boac">Boac</option>
+                                <option value="Mogpog">Mogpog</option>
+                                <option value="Gasan">Gasan</option>
+                                <option value="Buenavista">Buenavista</option>
+                                <option value="Torrijos">Torrijos</option>
+                                <option value="Santa Cruz">Santa Cruz</option>
+                            </select>
                         </div>
 
-                        <span class="small-muted">
-                            Select from the directory
-                        </span>
-                    </div>
-
-                    <div class="planner-search">
-                        <i class="bi bi-search"></i>
-
-                        <input type="search"
-                            id="plannerSearch"
-                            placeholder="Find a destination..."
-                            aria-label="Search planner destinations">
-                    </div>
-
-                    <div id="plannerDestinationList"
-                        class="planner-destination-list">
-
-                        <!-- Generated using JavaScript -->
-
-                    </div>
-
-                </div>
-
-
-                <!-- RIGHT: ITINERARY -->
-
-                <div class="itinerary-card">
-
-                    <div class="itinerary-card-top">
-
-                        <div>
-                            <span class="step-label">STEP 02</span>
-                            <h4>Your itinerary</h4>
+                        <div class="filter-control">
+                            <label for="categoryFilter">Category</label>
+                            <select id="categoryFilter" class="form-select">
+                                <option value="all">All categories</option>
+                                <option value="Beach">Beaches</option>
+                                <option value="Island">Islands</option>
+                                <option value="Heritage">Heritage</option>
+                                <option value="Nature">Nature</option>
+                                <option value="Culture">Culture</option>
+                            </select>
                         </div>
 
-                        <span class="itinerary-count" id="itineraryCount">
-                            0 places
-                        </span>
-
+                        <button type="button" class="reset-filter" data-action="reset-filters">
+                            <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+                            Reset filters
+                        </button>
                     </div>
 
-                    <div class="trip-title-area">
-
-                        <label for="tripTitle">Name your trip</label>
-
-                        <input type="text"
-                            id="tripTitle"
-                            class="form-control"
-                            maxlength="60"
-                            placeholder="e.g. Marinduque Weekend Escape">
-
+                    <div class="quick-categories" role="group" aria-label="Browse by interest">
+                        <span>Browse by interest</span>
+                        <button type="button" class="category-chip" data-interest="all" aria-pressed="true">All places</button>
+                        <button type="button" class="category-chip" data-interest="Beaches and sandbars" aria-pressed="false">Beaches and sandbars</button>
+                        <button type="button" class="category-chip" data-interest="Island hopping" aria-pressed="false">Island hopping</button>
+                        <button type="button" class="category-chip" data-interest="Waterfalls" aria-pressed="false">Waterfalls</button>
+                        <button type="button" class="category-chip" data-interest="Caves" aria-pressed="false">Caves</button>
+                        <button type="button" class="category-chip" data-interest="Mountains and springs" aria-pressed="false">Mountains and springs</button>
+                        <button type="button" class="category-chip" data-interest="History and heritage" aria-pressed="false">History and heritage</button>
+                        <button type="button" class="category-chip" data-interest="Culture and community" aria-pressed="false">Culture and community</button>
                     </div>
+                </div>
 
-                    <div class="itinerary-list" id="itineraryList">
+                <div class="destination-grid" id="destinationGrid">
+                    <div class="saved-empty" role="status">
+                        <i class="bi bi-arrow-repeat" aria-hidden="true"></i>
+                        Loading destinations...
+                    </div>
+                </div>
 
-                        <div class="itinerary-empty">
+                <div id="noResults" class="no-results" hidden>
+                    <div class="no-results-icon"><i class="bi bi-geo-alt" aria-hidden="true"></i></div>
+                    <h3>No places match your search</h3>
+                    <p>Try a different word, or clear a filter to see more of the island.</p>
+                    <button type="button" class="btn-main-custom" data-action="reset-filters">
+                        Show all destinations
+                    </button>
+                </div>
+            </div>
+        </section>
 
-                            <div class="empty-icon">
-                                <i class="bi bi-map"></i>
+
+        <!-- ================= ITINERARY PLANNER ================= -->
+        <section class="planner-section section-space" id="planner" aria-labelledby="plannerTitle">
+            <div class="container">
+                <div class="section-heading-row">
+                    <div>
+                        <p class="eyebrow">Interactive itinerary planner</p>
+                        <h2 class="section-title" id="plannerTitle">Plan your journey</h2>
+                        <p class="section-subtitle">
+                            Choose places, name your trip, and put the stops in the order you want to visit them.
+                        </p>
+                    </div>
+                    <div class="planner-icon" aria-hidden="true"><i class="bi bi-map"></i></div>
+                </div>
+
+                <div class="planner-layout">
+                    <div class="planner-selection">
+                        <div class="planner-card-header">
+                            <div>
+                                <span class="step-label">Step 1</span>
+                                <h3>Choose destinations</h3>
                             </div>
-
-                            <h5>Your journey starts here</h5>
-
-                            <p>
-                                Select destinations from the left
-                                to start building your itinerary.
-                            </p>
-
                         </div>
 
+                        <div class="planner-search">
+                            <i class="bi bi-search" aria-hidden="true"></i>
+                            <label for="plannerSearch" class="visually-hidden">Find a destination to add</label>
+                            <input type="search" id="plannerSearch" placeholder="Find a destination" autocomplete="off">
+                        </div>
+
+                        <div id="plannerDestinationList" class="planner-destination-list"
+                            tabindex="0" aria-label="Available destinations"></div>
                     </div>
 
-                    <div class="itinerary-footer">
+                    <div class="itinerary-card">
+                        <div class="itinerary-card-top">
+                            <div>
+                                <span class="step-label">Step 2</span>
+                                <h3>Your itinerary</h3>
+                            </div>
+                            <span class="itinerary-count" id="itineraryCount" aria-live="polite">0 places</span>
+                        </div>
 
-                        <button type="button" id="clearItinerary"
-                            class="text-button">
-                            Clear itinerary
-                        </button>
+                        <div class="trip-title-area">
+                            <label for="tripTitle">Name your trip</label>
+                            <input type="text" id="tripTitle" class="form-control" maxlength="60"
+                                placeholder="For example, Marinduque Weekend Escape">
+                        </div>
 
-                        <button type="button" id="saveTrip"
-                            class="btn-main-custom">
-                            <i class="bi bi-bookmark-check"></i>
-                            Save this trip
-                        </button>
+                        <div class="itinerary-list" id="itineraryList"></div>
 
+                        <div class="itinerary-footer">
+                            <button type="button" class="text-button" data-action="clear-itinerary">
+                                Clear itinerary
+                            </button>
+                            <div class="footer-buttons">
+                                <button type="button" class="btn-main-custom" data-action="save-trip">
+                                    <i class="bi bi-bookmark-check" aria-hidden="true"></i> Save this trip
+                                </button>
+                            </div>
+                        </div>
                     </div>
-
                 </div>
 
-            </div>
-
-            <p class="planner-disclaimer">
-                <i class="bi bi-info-circle"></i>
-                This planner organizes your selected destinations.
-                It does not calculate live routes, travel times,
-                or transportation schedules.
-            </p>
-
-        </div>
-    </section>
-
-
-    <!-- ================= SAVED ITEMS ================= -->
-
-    <section class="saved-section section-space" id="saved">
-
-        <div class="container">
-
-            <div class="section-topline">
-                <span>03 / YOUR COLLECTION</span>
-                <span>KEEP YOUR FAVORITES</span>
-            </div>
-
-            <div class="section-heading-row">
-
-                <div>
-                    <p class="eyebrow">YOUR TRAVEL COLLECTION</p>
-
-                    <h2 class="section-title">
-                        Saved <span>for later.</span>
-                    </h2>
-
-                    <p class="section-subtitle">
-                        Revisit your favorite places and continue
-                        planning trips you have saved.
+                <div class="planner-notes">
+                    <p class="planner-disclaimer">
+                        <i class="bi bi-info-circle" aria-hidden="true"></i>
+                        This planner organizes the places you choose. It does not calculate live routes,
+                        travel times, or transport availability, and it does not take bookings or payments.
                     </p>
                 </div>
+            </div>
+        </section>
 
-                <div class="saved-summary">
+
+        <!-- ================= SAVED ITEMS ================= -->
+        <section class="saved-section section-space" id="saved" aria-labelledby="savedTitle">
+            <div class="container">
+                <div class="section-heading-row">
                     <div>
-                        <strong id="favoriteCount">0</strong>
-                        <span>Favorites</span>
+                        <p class="eyebrow">Your travel collection</p>
+                        <h2 class="section-title" id="savedTitle">Saved for later</h2>
+                        <p class="section-subtitle" id="savedSubtitle">
+                            Revisit your favorite places and reopen the trips you saved.
+                        </p>
                     </div>
+                    <div class="saved-summary">
+                        <div><strong id="favoriteCount">0</strong><span>Favorites</span></div>
+                        <div><strong id="savedTripCount">0</strong><span>Saved trips</span></div>
+                    </div>
+                </div>
 
+                <div class="saved-heading">
                     <div>
-                        <strong id="savedTripCount">0</strong>
-                        <span>Saved trips</span>
+                        <i class="bi bi-heart-fill" aria-hidden="true"></i>
+                        <h3>Favorite destinations</h3>
                     </div>
+                    <span id="favoriteHeadingCount">0 saved</span>
                 </div>
+                <div class="saved-grid" id="favoritesGrid"></div>
 
-            </div>
-
-
-            <!-- SAVED DESTINATIONS -->
-
-            <div class="saved-heading">
-                <div>
-                    <i class="bi bi-heart-fill"></i>
-                    <h4>Favorite destinations</h4>
+                <div class="saved-heading saved-heading-trips">
+                    <div>
+                        <i class="bi bi-bookmark-star-fill" aria-hidden="true"></i>
+                        <h3>Your saved itineraries</h3>
+                    </div>
+                    <span id="tripHeadingCount">0 saved</span>
                 </div>
-
-                <span id="favoriteHeadingCount">0 saved</span>
+                <div class="saved-trips-grid" id="savedTripsGrid"></div>
             </div>
-
-            <div class="saved-grid" id="favoritesGrid">
-
-                <!-- Generated using JavaScript -->
-
-            </div>
-
-
-            <!-- SAVED TRIPS -->
-
-            <div class="saved-heading saved-trip-heading">
-                <div>
-                    <i class="bi bi-bookmark-star-fill"></i>
-                    <h4>Your saved itineraries</h4>
-                </div>
-
-                <span id="tripHeadingCount">0 saved</span>
-            </div>
-
-            <div class="saved-trips-grid" id="savedTripsGrid">
-
-                <!-- Generated using JavaScript -->
-
-            </div>
-
-        </div>
-    </section>
+        </section>
+    </main>
 
 
     <!-- ================= FOOTER ================= -->
-
     <footer class="footer-section">
-
         <div class="container">
-
             <div class="footer-main">
-
                 <div class="footer-brand">
-
                     <a href="#home" class="footer-logo">
-                        <i class="bi bi-compass-fill"></i>
-                        Lakbay<span>Marinduque.</span>
+                        <i class="bi bi-compass-fill" aria-hidden="true"></i> Lakbay Marinduque
                     </a>
-
-                    <p>
-                        Discover the destinations, traditions,
-                        and stories of Marinduque.
-                    </p>
-
+                    <p>Discover the destinations, traditions and stories of Marinduque.</p>
                 </div>
-
                 <div class="footer-links">
-
                     <div>
-                        <h6>EXPLORE</h6>
+                        <h4>Explore</h4>
                         <a href="#destinations">Destinations</a>
-                        <a href="#culture">Culture & Heritage</a>
                     </div>
-
                     <div>
-                        <h6>PLAN</h6>
-                        <a href="#planner">Trip Planner</a>
-                        <a href="#saved">Saved Trips</a>
+                        <h4>Plan</h4>
+                        <a href="#planner">Trip planner</a>
+                        <a href="#saved">Saved trips</a>
                     </div>
-
                 </div>
-
             </div>
-
             <div class="footer-bottom">
-
-                <span>© 2026 Lakbay Marinduque</span>
-
-                <span>
-                    A Tourism and Cultural Discovery Project
-                </span>
-
+                <span>&copy; 2026 Lakbay Marinduque</span>
+                <span>Favorites and trips are saved only in this browser.</span>
             </div>
-
         </div>
     </footer>
 
 
     <!-- ================= DESTINATION DETAILS MODAL ================= -->
-
-    <div class="modal fade" id="destinationModal"
-        tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
-
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-
+    <div class="modal fade" id="destinationModal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content destination-modal">
-
-                <button type="button" class="modal-close"
-                    data-bs-dismiss="modal" aria-label="Close">
-                    <i class="bi bi-x-lg"></i>
+                <button type="button" class="modal-close" data-bs-dismiss="modal" aria-label="Close details">
+                    <i class="bi bi-x-lg" aria-hidden="true"></i>
                 </button>
 
-                <img id="modalImage"
-                    class="modal-destination-image"
-                    src="" alt="">
+                <img id="modalImage" class="modal-destination-image" alt="">
 
                 <div class="modal-body destination-modal-body">
-
                     <span class="category-badge" id="modalCategory"></span>
-
                     <p class="destination-location" id="modalLocation"></p>
-
                     <h2 id="modalTitle"></h2>
-
                     <p id="modalDescription" class="modal-description"></p>
 
-                    <div class="detail-information">
+                    <ul class="highlight-list" id="modalHighlights"></ul>
 
-                        <div>
-                            <span>ABOUT THIS PLACE</span>
+                    <div class="detail-information">
+                        <div class="detail-wide">
+                            <h3>About this place</h3>
                             <p id="modalBackground"></p>
                         </div>
-
                         <div>
-                            <span>TRAVEL INFORMATION</span>
-                            <p id="modalTravelInfo"></p>
+                            <h3>Location</h3>
+                            <p id="modalLocationDetail"></p>
                         </div>
-
+                        <div>
+                            <h3>General access</h3>
+                            <p id="modalAccess"></p>
+                        </div>
+                        <div class="detail-wide">
+                            <h3>Please confirm locally</h3>
+                            <p id="modalConfirm"></p>
+                        </div>
                     </div>
 
                     <div class="modal-actions">
-
-                        <button type="button" id="modalFavorite"
-                            class="btn-outline-custom">
-                            <i class="bi bi-heart"></i>
-                            Save to favorites
+                        <button type="button" id="modalFavorite" class="btn-outline-custom"></button>
+                        <button type="button" id="modalAddItinerary" class="btn-main-custom">
+                            <i class="bi bi-plus-lg" aria-hidden="true"></i> Add to itinerary
                         </button>
-
-                        <button type="button" id="modalAddItinerary"
-                            class="btn-main-custom">
-                            <i class="bi bi-plus-lg"></i>
-                            Add to itinerary
-                        </button>
-
                     </div>
 
+                    <p class="photo-credit" id="modalCredit" hidden></p>
+
                     <small class="information-note">
-                        Confirm local conditions and visitor information
-                        before traveling.
+                        This information is general and does not guarantee availability. Confirm details with the local tourism office before you travel.
                     </small>
-
                 </div>
-
             </div>
+        </div>
+    </div>
 
+
+    <!-- ================= CONFIRM MODAL ================= -->
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content dialog-modal">
+                <div class="modal-header">
+                    <h2 class="modal-title" id="confirmTitle">Are you sure?</h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="confirmMessage" class="mb-4"></p>
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="button" class="btn-outline-custom" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn-danger-custom" id="confirmOk">Confirm</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
 
     <!-- ================= NOTIFICATION ================= -->
-
     <div class="toast-container position-fixed bottom-0 end-0 p-3">
-
-        <div id="appToast"
-            class="toast custom-toast"
-            role="status"
-            aria-live="polite"
-            aria-atomic="true">
-
+        <div id="appToast" class="toast custom-toast" role="status" aria-live="polite" aria-atomic="true">
             <div class="toast-body">
-                <i class="bi bi-check-circle-fill"></i>
-                <span id="toastMessage">Action completed.</span>
+                <i class="bi bi-check-circle-fill" id="toastIcon" aria-hidden="true"></i>
+                <span id="toastMessage"></span>
             </div>
-
         </div>
-
     </div>
 
-
-    <!-- BOOTSTRAP JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-    <!-- CUSTOM JS -->
     <script src="script.js"></script>
-
 </body>
 </html>
